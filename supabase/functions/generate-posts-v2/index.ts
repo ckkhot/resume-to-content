@@ -278,33 +278,33 @@ function generateContextualHook(tone: string, context: any): string {
   // Generate completely dynamic content based on tone and context
   if (tone === 'professional') {
     const professional_starters = [
-      \`\${randomTimeframe} in \${randomPromptWord} has fundamentally changed my approach to \${focus}.\`,
-      \`My journey through \${isUCDavis ? 'UC Davis and ' : ''}\${randomPromptWord} \${randomInsight} that success requires \${focus}.\`,
-      \`After \${randomTimeframe.toLowerCase()} of \${prompt.toLowerCase()}, I've discovered what truly drives \${focus}.\`,
-      \`The intersection of \${randomPromptWord} and \${focus} is creating opportunities I never expected.\`,
-      \`Working in \${randomPromptWord} has \${randomInsight} that \${focus} isn't what most people think.\`
+      `${randomTimeframe} in ${randomPromptWord} has fundamentally changed my approach to ${focus}.`,
+      `My journey through ${isUCDavis ? 'UC Davis and ' : ''}${randomPromptWord} ${randomInsight} that success requires ${focus}.`,
+      `After ${randomTimeframe.toLowerCase()} of ${prompt.toLowerCase()}, I've discovered what truly drives ${focus}.`,
+      `The intersection of ${randomPromptWord} and ${focus} is creating opportunities I never expected.`,
+      `Working in ${randomPromptWord} has ${randomInsight} that ${focus} isn't what most people think.`
     ];
     return professional_starters[uniqueId % professional_starters.length];
   }
   
   if (tone === 'casual') {
     const casual_starters = [
-      \`\${randomSurprise} \${randomTimeframe} of \${randomPromptWord} and I finally get why \${focus} matters.\`,
-      \`Just spent \${randomTimeframe.toLowerCase()} in \${prompt.toLowerCase()} and here's what nobody tells you.\`,
-      \`\${randomSurprise} The hardest part of \${randomPromptWord} isn't the technical stuff.\`,
-      \`Six months ago I thought \${randomPromptWord} was about X. Turns out it's all about \${focus}.\`,
-      \`\${randomSurprise} \${randomPromptWord} \${randomInsight} me more about \${focus} than I expected.\`
+      `${randomSurprise} ${randomTimeframe} of ${randomPromptWord} and I finally get why ${focus} matters.`,
+      `Just spent ${randomTimeframe.toLowerCase()} in ${prompt.toLowerCase()} and here's what nobody tells you.`,
+      `${randomSurprise} The hardest part of ${randomPromptWord} isn't the technical stuff.`,
+      `Six months ago I thought ${randomPromptWord} was about X. Turns out it's all about ${focus}.`,
+      `${randomSurprise} ${randomPromptWord} ${randomInsight} me more about ${focus} than I expected.`
     ];
     return casual_starters[uniqueId % casual_starters.length];
   }
   
   // Bold tone
   const bold_starters = [
-    \`\${randomControversial} The \${randomPromptWord} industry has \${focus} completely backwards.\`,
-    \`\${randomControversial} Most \${randomPromptWord} advice ignores the real driver of \${focus}.\`,
-    \`Everyone's obsessing over \${randomPromptWord} while missing what actually creates \${focus}.\`,
-    \`\${randomControversial} \${randomPromptWord} success has more to do with \${focus} than talent.\`,
-    \`The \${randomPromptWord} industry is broken because it prioritizes complexity over \${focus}.\`
+    `${randomControversial} The ${randomPromptWord} industry has ${focus} completely backwards.`,
+    `${randomControversial} Most ${randomPromptWord} advice ignores the real driver of ${focus}.`,
+    `Everyone's obsessing over ${randomPromptWord} while missing what actually creates ${focus}.`,
+    `${randomControversial} ${randomPromptWord} success has more to do with ${focus} than talent.`,
+    `The ${randomPromptWord} industry is broken because it prioritizes complexity over ${focus}.`
   ];
   return bold_starters[uniqueId % bold_starters.length];
 }
@@ -337,47 +337,87 @@ function generateContextualBody(tone: string, context: any): string {
   
   if (tone === 'professional') {
     const professionalBodies = [
-      \`My experience with \${skillsList} and focus on \${keyWord} has revealed that sustainable \${focus} requires a systematic approach.
+      `My experience with ${skillsList} and focus on ${keyWord} has revealed that sustainable ${focus} requires a systematic approach.
 
 Critical success factors I've identified:
 
-• Technical excellence combined with \${randomLearning}
-• Understanding \${randomInsight} and market context  
-• Building relationships that drive \${randomOutcome}
-• Continuous adaptation to \${randomChallenge}
-• Focus on \${randomOutcome} over technical complexity
+• Technical excellence combined with ${randomLearning}
+• Understanding ${randomInsight} and market context  
+• Building relationships that drive ${randomOutcome}
+• Continuous adaptation to ${randomChallenge}
+• Focus on ${randomOutcome} over technical complexity
 
-The professionals who consistently deliver \${randomOutcome} are those who master both the technical and \${randomLearning} aspects of their work.\`,
+The professionals who consistently deliver ${randomOutcome} are those who master both the technical and ${randomLearning} aspects of their work.`,
 
-      \`Through my work in \${keyWord} and expertise in \${skillsList}, I've learned that achieving \${focus} demands more than technical proficiency.
+      `Through my work in ${keyWord} and expertise in ${skillsList}, I've learned that achieving ${focus} demands more than technical proficiency.
 
 Key insights from my journey:
 
-• \${randomLearning.charAt(0).toUpperCase() + randomLearning.slice(1)} often matters more than technical skills
-• Success requires navigating \${randomChallenge} effectively
-• Understanding \${randomInsight} drives strategic decisions
-• Building \${randomOutcome} requires cross-functional collaboration
+• ${randomLearning.charAt(0).toUpperCase() + randomLearning.slice(1)} often matters more than technical skills
+• Success requires navigating ${randomChallenge} effectively
+• Understanding ${randomInsight} drives strategic decisions
+• Building ${randomOutcome} requires cross-functional collaboration
 • Real impact comes from solving business problems, not showcasing technology
 
-The most successful professionals I know excel at translating technical capabilities into \${randomOutcome}.\`,
+The most successful professionals I know excel at translating technical capabilities into ${randomOutcome}.`,
 
-      \`My journey with \${keyWord} has taught me that \${focus} isn't just about mastering \${skillsList}.
+      `My journey with ${keyWord} has taught me that ${focus} isn't just about mastering ${skillsList}.
 
 What separates high-impact professionals:
 
-• Deep understanding of \${randomInsight} and customer needs
-• Ability to navigate \${randomChallenge} while maintaining quality
-• Focus on \${randomOutcome} rather than process perfection
-• Strong \${randomLearning} that enable team success
-• Strategic thinking that connects daily work to broader \${focus}
+• Deep understanding of ${randomInsight} and customer needs
+• Ability to navigate ${randomChallenge} while maintaining quality
+• Focus on ${randomOutcome} rather than process perfection
+• Strong ${randomLearning} that enable team success
+• Strategic thinking that connects daily work to broader ${focus}
 
-The future belongs to those who can combine technical depth with \${randomLearning} to drive \${randomOutcome}.\`
+The future belongs to those who can combine technical depth with ${randomLearning} to drive ${randomOutcome}.`
     ];
     
     return professionalBodies[uniqueId % professionalBodies.length];
   }
   
   if (tone === 'casual') {
+    const casualBodies = [
+      `Working on ${keyWord} taught me ${skillsList}, but the real world is teaching me everything about ${randomLearning}.
+
+What my ${degree} didn't prepare me for:
+
+• How much time you spend dealing with ${randomChallenge}
+• That ${randomLearning} often trumps technical expertise
+• How important understanding ${randomInsight} really is  
+• The politics behind every decision about ${randomOutcome}
+• That soft skills determine who actually drives ${focus}
+
+Turns out the technical stuff was just the entry fee. The human element is where ${focus} really happens.`,
+
+      `Six months into ${keyWord} and I finally understand why everyone talks about ${randomLearning}.
+
+Reality check on ${focus}:
+
+• It's 20% ${skillsList} and 80% everything else
+• Understanding ${randomInsight} matters more than perfect execution
+• ${randomChallenge} will test you more than any technical problem
+• Building ${randomOutcome} requires more ${randomLearning} than coding
+• The best opportunities go to people who can navigate both
+
+The sweet spot is being technical enough to be credible but focused enough on ${randomOutcome} to be valuable.`,
+
+      `Real talk about ${keyWord}: everyone focuses on ${skillsList}, but that's not where careers are made.
+
+What actually drives ${focus}:
+
+• Your ability to handle ${randomChallenge} under pressure
+• Understanding ${randomInsight} before your competitors do
+• Building relationships that create ${randomOutcome}
+• Developing ${randomLearning} that make teams better
+• Knowing when technical perfection matters vs when ${focus} matters more
+
+The professionals who get promoted aren't always the most technically skilled. They're the ones who consistently deliver ${randomOutcome}.`
+    ];
+    
+    return casualBodies[uniqueId % casualBodies.length];
+  }
     const casualBodies = [
       \`Working on \${keyWord} taught me \${skillsList}, but the real world is teaching me everything about \${randomLearning}.
 
@@ -421,41 +461,41 @@ The professionals who get promoted aren't always the most technically skilled. T
   
   // Bold tone
   const boldBodies = [
-    \`After working in \${keyWord} for years, I've come to a controversial conclusion: the industry has \${focus} completely backwards.
+    `After working in ${keyWord} for years, I've come to a controversial conclusion: the industry has ${focus} completely backwards.
 
 What we get wrong:
 
-• Obsession with \${skillsList} over understanding \${randomInsight}
-• Building solutions that impress technologists but ignore \${randomOutcome}
-• Treating \${randomChallenge} as edge cases instead of core challenges  
-• Prioritizing technical complexity over \${randomLearning}
-• Measuring success by sophistication rather than \${randomOutcome}
+• Obsession with ${skillsList} over understanding ${randomInsight}
+• Building solutions that impress technologists but ignore ${randomOutcome}
+• Treating ${randomChallenge} as edge cases instead of core challenges  
+• Prioritizing technical complexity over ${randomLearning}
+• Measuring success by sophistication rather than ${randomOutcome}
 
-The most successful professionals I know aren't the ones with the most impressive technical skills. They're the ones who can take complex \${skillsList} and apply them to create simple, valuable \${randomOutcome}.\`,
+The most successful professionals I know aren't the ones with the most impressive technical skills. They're the ones who can take complex ${skillsList} and apply them to create simple, valuable ${randomOutcome}.`,
 
-    \`The \${keyWord} industry has convinced everyone they need more \${skillsList} when they really need better \${focus}.
+    `The ${keyWord} industry has convinced everyone they need more ${skillsList} when they really need better ${focus}.
 
-Hard truths about \${focus}:
+Hard truths about ${focus}:
 
-• Most companies are drowning in technical complexity but starving for \${randomOutcome}
-• \${randomChallenge} kills more projects than technical limitations
-• Understanding \${randomInsight} matters more than perfect algorithms
-• \${randomLearning} determine who actually drives change
+• Most companies are drowning in technical complexity but starving for ${randomOutcome}
+• ${randomChallenge} kills more projects than technical limitations
+• Understanding ${randomInsight} matters more than perfect algorithms
+• ${randomLearning} determine who actually drives change
 • The gap between what's technically possible and what's actually valuable is enormous
 
-We're optimizing for the wrong metrics while the real drivers of \${randomOutcome} go ignored.\`,
+We're optimizing for the wrong metrics while the real drivers of ${randomOutcome} go ignored.`,
 
-    \`Unpopular opinion: The \${keyWord} field is broken because we prioritize \${skillsList} over \${focus}.
+    `Unpopular opinion: The ${keyWord} field is broken because we prioritize ${skillsList} over ${focus}.
 
 What needs to change:
 
-• Stop treating \${randomChallenge} as someone else's problem
-• Focus on \${randomOutcome} instead of technical perfection
-• Invest in \${randomLearning} as much as technical skills
-• Understand \${randomInsight} before building solutions
-• Measure impact by \${randomOutcome}, not technical sophistication
+• Stop treating ${randomChallenge} as someone else's problem
+• Focus on ${randomOutcome} instead of technical perfection
+• Invest in ${randomLearning} as much as technical skills
+• Understand ${randomInsight} before building solutions
+• Measure impact by ${randomOutcome}, not technical sophistication
 
-The future belongs to professionals who can bridge the gap between technical capability and real-world \${focus}.\`
+The future belongs to professionals who can bridge the gap between technical capability and real-world ${focus}.`
   ];
   
   return boldBodies[uniqueId % boldBodies.length];
@@ -520,37 +560,36 @@ function generateContextualCTA(tone: string, context: any): string {
   
   if (tone === 'professional') {
     const professionalCTAs = [
-      \`\${randomQuestion} with \${focus} in your professional journey? I'd welcome insights from fellow professionals.\`,
-      \`Fellow professionals - \${randomQuestion.toLowerCase()} \${randomTopic} and \${focus}? \${randomEngagement}\`,
-      \`\${randomQuestion} balancing technical excellence with \${focus}? Looking forward to your perspectives.\`,
-      \`What strategies have proven most effective for achieving \${focus} in your field? \${randomEngagement}\`,
-      \`How do you approach \${randomTopic} while maintaining focus on \${focus}? Interested in your approaches.\`
+      `${randomQuestion} with ${focus} in your professional journey? I'd welcome insights from fellow professionals.`,
+      `Fellow professionals - ${randomQuestion.toLowerCase()} ${randomTopic} and ${focus}? ${randomEngagement}`,
+      `${randomQuestion} balancing technical excellence with ${focus}? Looking forward to your perspectives.`,
+      `What strategies have proven most effective for achieving ${focus} in your field? ${randomEngagement}`,
+      `How do you approach ${randomTopic} while maintaining focus on ${focus}? Interested in your approaches.`
     ];
     return professionalCTAs[uniqueId % professionalCTAs.length];
   }
   
   if (tone === 'casual') {
     const casualCTAs = [
-      \`\${randomQuestion} with \${randomTopic}? \${randomEngagement}\`,
-      \`Fellow professionals - \${randomQuestion.toLowerCase()} \${focus} in your day-to-day work?\`,
-      \`Anyone else dealing with \${randomTopic}? What's working for you?\`,
-      \`\${randomQuestion} navigating \${focus}? Drop your stories below!\`,
-      \`What's your take on \${randomTopic} and \${focus}? \${randomEngagement}\`
+      `${randomQuestion} with ${randomTopic}? ${randomEngagement}`,
+      `Fellow professionals - ${randomQuestion.toLowerCase()} ${focus} in your day-to-day work?`,
+      `Anyone else dealing with ${randomTopic}? What's working for you?`,
+      `${randomQuestion} navigating ${focus}? Drop your stories below!`,
+      `What's your take on ${randomTopic} and ${focus}? ${randomEngagement}`
     ];
     return casualCTAs[uniqueId % casualCTAs.length];
   }
   
   // Bold tone
   const boldCTAs = [
-    \`\${randomQuestion} challenging the status quo in \${randomTopic}? Time for some real talk.\`,
-    \`What industry assumption about \${focus} needs to be called out? \${randomEngagement}\`,
-    \`\${randomQuestion} driving real change in \${randomTopic}? Let's discuss.\`,
-    \`What controversial opinion do you have about \${focus}? Ready for the debate!\`,
-    \`Which \${randomTopic} trend is completely overrated? \${randomEngagement}\`
+    `${randomQuestion} challenging the status quo in ${randomTopic}? Time for some real talk.`,
+    `What industry assumption about ${focus} needs to be called out? ${randomEngagement}`,
+    `${randomQuestion} driving real change in ${randomTopic}? Let's discuss.`,
+    `What controversial opinion do you have about ${focus}? Ready for the debate!`,
+    `Which ${randomTopic} trend is completely overrated? ${randomEngagement}`
   ];
   return boldCTAs[uniqueId % boldCTAs.length];
 }
-  const ctaVariations = {
     professional: {
       graduation: [
         'Fellow recent graduates - what has been your biggest learning curve transitioning from academic theory to professional practice?',
