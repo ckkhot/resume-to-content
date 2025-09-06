@@ -105,42 +105,50 @@ serve(async (req) => {
       );
     }
 
-    // STEP 5: Generate posts (fallback first, OpenAI if available)
-    let posts = [
-      {
-        tone: 'professional',
-        hook: 'Sharing insights on business analytics thought leadership',
-        body: 'As a recent MS graduate in business analytics, I have been reflecting on what it means to drive thought leadership in this dynamic field. The intersection of data science, business strategy, and innovation creates unique opportunities for emerging professionals to contribute meaningfully to organizational decision-making.\\n\\nThrough academic research and practical applications, I have observed that effective thought leadership requires not just technical expertise, but also the ability to translate complex insights into actionable business strategies. The most impactful analytics professionals are those who can bridge the gap between data and strategic outcomes.\\n\\nLooking ahead, I believe the future of business analytics lies in democratizing data-driven insights across all organizational levels, making analytics accessible and actionable for every stakeholder.',
-        cta: 'What do you think defines thought leadership in business analytics? Share your perspectives in the comments.'
-      },
-      {
-        tone: 'casual',
-        hook: 'Just finished my MS in business analytics and have some thoughts on thought leadership! 🎓',
-        body: 'Okay, so here is what I learned about being a thought leader in business analytics as someone fresh out of grad school. First - you do not need decades of experience to have valuable insights. Sometimes fresh perspectives are exactly what the industry needs.\\n\\nSecond, thought leadership is not about having all the answers. It is about asking the right questions and being curious enough to explore them deeply. Some of my best contributions have come from approaching problems with a beginner mind and challenging conventional approaches.\\n\\nThe analytics field is evolving so rapidly that everyone is learning constantly anyway. What matters is sharing your journey, insights, and questions openly with the community.',
-        cta: 'Fellow analytics enthusiasts - what unconventional insight have you discovered recently? Let me know in the comments! 💭'
-      },
-      {
-        tone: 'bold',
-        hook: 'Hot take: Most "thought leaders" in business analytics are missing the point! 🔥',
-        body: 'After completing my MS in business analytics, I am convinced that true thought leadership in this field is not about showcasing the latest algorithms or tools. It is about fundamentally changing how organizations approach data-driven transformation.\\n\\nToo many so-called experts focus on technical complexity when the real challenge is cultural change. The most valuable analytics professionals are not those who build the most sophisticated models, but those who can drive organizational adoption and make data accessible to everyone.\\n\\nWe need fewer people showing off their technical skills and more leaders who can democratize analytics, challenge existing paradigms, and drive real business impact through strategic thinking.',
-        cta: 'Ready to challenge the status quo in analytics? What sacred cows in our field need questioning? Drop your bold takes below! 👇'
-      }
-    ];
+    // STEP 5: Generate posts (always try OpenAI first for variation)
+    let posts = [];
+    let useOpenAI = true;
 
-    // Try OpenAI if available
+    // Try OpenAI first for variation
     if (openaiApiKey) {
       console.log('🔄 Attempting OpenAI generation...');
       try {
-        let systemPrompt = 'You are a LinkedIn content expert. Generate 3 high-quality LinkedIn posts about business analytics thought leadership.';
-        
+        // Build personalized context
+        let userContext = '';
         if (resumeData && resumeData.name) {
-          systemPrompt += ' User is: ' + resumeData.name;
-          if (resumeData.skills) systemPrompt += ', with skills in: ' + resumeData.skills.join(', ');
+          userContext = `User is: ${resumeData.name}`;
+          if (resumeData.skills) userContext += `, with expertise in: ${resumeData.skills.join(', ')}`;
+          if (resumeData.experience) userContext += `, with experience in: ${resumeData.experience}`;
         } else {
-          systemPrompt += ' User is a recent MS graduate in business analytics.';
+          userContext = 'User is a business analytics professional';
         }
-        
-        systemPrompt += ' Generate posts in 3 tones: professional, casual, bold. Return JSON array with objects: {"tone": "...", "hook": "...", "body": "...", "cta": "..."}';
+
+        // Enhanced system prompt with new format requirements
+        const systemPrompt = `You are a LinkedIn content strategist. Create 3 unique, varied LinkedIn posts about the topic provided.
+
+${userContext}
+
+FORMAT REQUIREMENTS:
+- Start with a sticky, scroll-stopping, one sentence hook
+- Body in narrative style using storytelling
+- Use bullet points where necessary for clarity
+- NO EMOJIS anywhere in the content
+- End with a clear CTA encouraging comments, likes, or engagement
+
+TONE VARIATIONS:
+1. Professional: Corporate-friendly, authoritative
+2. Casual: Relatable, conversational 
+3. Bold: Attention-grabbing, provocative
+
+VARIATION: Each post must be completely different in approach, perspective, and content. Use different angles, examples, and insights.
+
+Return JSON array: [{"tone": "professional", "hook": "...", "body": "...", "cta": "..."}, {"tone": "casual", "hook": "...", "body": "...", "cta": "..."}, {"tone": "bold", "hook": "...", "body": "...", "cta": "..."}]`;
+
+        // Add timestamp for variation
+        const timestamp = Date.now();
+        const userPrompt = `Topic: ${prompt}
+
+Generate 3 completely different posts about this topic. Each should offer a unique perspective or angle. Variation ID: ${timestamp}`;
 
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -152,32 +160,72 @@ serve(async (req) => {
             model: 'gpt-4o-mini',
             messages: [
               { role: 'system', content: systemPrompt },
-              { role: 'user', content: 'Topic: ' + prompt }
+              { role: 'user', content: userPrompt }
             ],
-            temperature: 0.7,
-            max_tokens: 2000,
+            temperature: 0.9, // Higher temperature for more variation
+            max_tokens: 3000,
           }),
         });
 
         if (openaiResponse.ok) {
           const openaiResult = await openaiResponse.json();
+          console.log('🔍 OpenAI response received');
+          
           try {
             const generatedPosts = JSON.parse(openaiResult.choices[0].message.content);
-            if (Array.isArray(generatedPosts) && generatedPosts.length > 0) {
-              posts = generatedPosts;
-              console.log('✅ OpenAI posts generated');
+            if (Array.isArray(generatedPosts) && generatedPosts.length === 3) {
+              posts = generatedPosts.map(post => ({
+                ...post,
+                hook: post.hook || 'Default hook',
+                body: post.body || 'Default body',
+                cta: post.cta || 'What are your thoughts?'
+              }));
+              console.log('✅ OpenAI posts generated successfully');
+              useOpenAI = false; // Skip fallback
+            } else {
+              console.log('⚠️ Invalid OpenAI response structure, using fallback');
             }
           } catch (e) {
-            console.log('⚠️ OpenAI response parsing failed, using fallback');
+            console.log('⚠️ OpenAI response parsing failed:', e.message);
           }
         } else {
-          console.log('⚠️ OpenAI API failed, using fallback');
+          const errorText = await openaiResponse.text();
+          console.log('⚠️ OpenAI API failed:', openaiResponse.status, errorText);
         }
       } catch (e) {
-        console.log('⚠️ OpenAI error, using fallback:', e.message);
+        console.log('⚠️ OpenAI request error:', e.message);
       }
-    } else {
-      console.log('⚠️ No OpenAI key, using fallback posts');
+    }
+
+    // Fallback posts with new format (only if OpenAI failed or unavailable)
+    if (posts.length === 0) {
+      console.log('📝 Using fallback posts with new format');
+      const fallbackVariations = [
+        {
+          professional: {
+            hook: 'The biggest mistake in business analytics is thinking data speaks for itself.',
+            body: 'Throughout my career in analytics, I have observed that raw data without context is just noise. The real value comes from translating complex datasets into actionable business insights.\n\nSuccessful analytics professionals understand three critical principles:\n\n• Data storytelling drives decision-making\n• Context transforms numbers into strategy\n• Communication bridges the gap between analysis and action\n\nThe most impactful analytics work happens when technical expertise meets business acumen.',
+            cta: 'What has been your experience turning data into actionable insights? Share your approach in the comments.'
+          },
+          casual: {
+            hook: 'Here is what nobody tells you about breaking into business analytics.',
+            body: 'Starting my analytics journey, I thought it was all about mastering Python and SQL. Boy, was I wrong.\n\nThe real skills that matter:\n\n• Asking the right business questions\n• Translating technical findings for non-technical stakeholders\n• Understanding the story behind the numbers\n• Building relationships across departments\n\nTechnical skills get you in the door, but business sense keeps you valuable.',
+            cta: 'Current and aspiring analysts - what surprised you most about this field? Would love to hear your experiences.'
+          },
+          bold: {
+            hook: 'Most companies are drowning in data but starving for insights.',
+            body: 'After working with dozens of organizations, I have seen the same pattern repeatedly. Companies invest millions in data infrastructure but fail at the most crucial step: turning information into action.\n\nThe uncomfortable truth:\n\n• 80% of analytics projects never influence a single business decision\n• Executives get overwhelmed by dashboards that answer the wrong questions\n• Teams mistake correlation for causation and call it strategy\n\nWe need fewer data scientists building models and more analytics professionals solving real business problems.',
+            cta: 'Ready to challenge how your organization uses data? What is one analytics myth your company needs to stop believing?'
+          }
+        }
+      ];
+
+      const randomVariation = fallbackVariations[0];
+      posts = [
+        { tone: 'professional', ...randomVariation.professional },
+        { tone: 'casual', ...randomVariation.casual },
+        { tone: 'bold', ...randomVariation.bold }
+      ];
     }
 
     console.log('✅ Returning', posts.length, 'posts');
@@ -185,8 +233,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         posts: posts,
-        source: openaiApiKey ? 'openai_or_fallback' : 'fallback',
-        message: 'Posts generated successfully'
+        source: useOpenAI ? 'fallback' : 'openai',
+        message: 'Posts generated successfully',
+        timestamp: new Date().toISOString()
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
