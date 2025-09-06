@@ -8,7 +8,7 @@ import { ResumeUpload } from "./ResumeUpload";
 import { ThemeToggle } from "./ThemeToggle";
 import { Auth } from "./Auth";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GeneratedPost {
   hook: string;
