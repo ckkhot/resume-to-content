@@ -84,11 +84,11 @@ ACHIEVEMENTS:
       console.error('Error processing resume:', error);
       setIsProcessing(false);
       toast({
-        title: "Processing failed",
-        description: "Failed to process resume. You can still generate posts without resume data.",
+        title: "Resume processing failed",
+        description: "No worries! You can still generate amazing LinkedIn posts. Resume data helps personalize content, but isn't required.",
         variant: "destructive"
       });
-      // Don't call onUploadComplete on error - let user try again
+      // Don't call onUploadComplete on error - let user try again or proceed without resume
     }
   };
 

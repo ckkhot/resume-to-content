@@ -49,19 +49,26 @@ export const LinkedInPostGenerator = () => {
       const { data, error } = await supabase.functions.invoke('generate-linkedin-posts', {
         body: { 
           prompt: prompt,
-          resumeData: resumeData // Now passes actual resume data
+          resumeData: resumeData || null // Ensure we pass null if no resume data
         }
       });
 
-      if (error) throw error;
+      console.log('Post generation response:', { data, error });
 
-      const posts = data.posts || [];
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to generate posts');
+      }
+
+      const posts = data?.posts || [];
+      console.log('Generated posts:', posts);
+      
       setGeneratedPosts(posts);
       
       if (posts.length > 0) {
         setMessages(prev => [...prev, { 
           type: 'assistant', 
-          content: `I've generated ${posts.length} LinkedIn posts in different tones based on your ${resumeData ? 'resume data and ' : ''}prompt. Each includes a compelling hook, narrative body, and engaging CTA.` 
+          content: `I've generated ${posts.length} LinkedIn posts in different tones ${resumeData ? 'personalized with your resume data' : 'based on your prompt'}. Each includes a compelling hook, narrative body, and engaging CTA.` 
         }]);
       } else {
         setMessages(prev => [...prev, { 
@@ -73,7 +80,7 @@ export const LinkedInPostGenerator = () => {
       console.error('Error generating posts:', error);
       setMessages(prev => [...prev, { 
         type: 'assistant', 
-        content: 'Sorry, I encountered an error generating posts. Please check your connection and try again. If the issue persists, try a simpler prompt.' 
+        content: `Sorry, I encountered an error generating posts: ${error.message || 'Unknown error'}. Please check your connection and try again.` 
       }]);
     } finally {
       setIsGenerating(false);
@@ -191,7 +198,7 @@ export const LinkedInPostGenerator = () => {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                💡 Upload your resume for more personalized content, or generate posts directly with any topic!
+                💡 <strong>Tip:</strong> You can generate posts right away! Upload a resume for more personalized content, or start creating posts with any topic.
               </p>
             </Card>
           </div>
