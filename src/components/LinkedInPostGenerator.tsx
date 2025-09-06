@@ -38,7 +38,7 @@ export const LinkedInPostGenerator = () => {
   }
 
   const handleGeneratePosts = async () => {
-    if (!prompt.trim() || !resumeUploaded) return;
+    if (!prompt.trim()) return;
     
     setIsGenerating(true);
     setMessages(prev => [...prev, { type: 'user', content: prompt }]);
@@ -167,18 +167,15 @@ export const LinkedInPostGenerator = () => {
                 />
                 <Button
                   onClick={handleGeneratePosts}
-                  disabled={!resumeUploaded || !prompt.trim() || isGenerating}
+                  disabled={!prompt.trim() || isGenerating}
                   className="btn-tech flex-shrink-0"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
-              {!resumeUploaded && (
-                <p className="text-xs text-destructive mt-2 flex items-center gap-1">
-                  <Upload className="h-3 w-3" />
-                  Please upload your resume first
-                </p>
-              )}
+              <p className="text-xs text-muted-foreground mt-2">
+                💡 Upload your resume for more personalized content, or generate posts directly with any topic!
+              </p>
             </Card>
           </div>
         </div>
