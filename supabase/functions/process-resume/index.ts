@@ -12,13 +12,17 @@ serve(async (req) => {
   }
 
   try {
+    console.log('=== Resume processing started ===');
     const { resumeText } = await req.json()
+    console.log('✅ Resume text received, length:', resumeText?.length);
     
     // Get OpenAI API key from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiApiKey) {
+      console.error('❌ OpenAI API key not found');
       throw new Error('OpenAI API key not found')
     }
+    console.log('✅ OpenAI API key found');
 
     // Create authorization header
     const authHeader = req.headers.get('Authorization')!
@@ -30,7 +34,11 @@ serve(async (req) => {
 
     // Get user from token
     const { data: { user } } = await supabaseClient.auth.getUser()
-    if (!user) throw new Error('Unauthorized')
+    if (!user) {
+      console.error('❌ User authentication failed');
+      throw new Error('Unauthorized');
+    }
+    console.log('✅ User authenticated:', user.id);
 
     // Extract structured data from resume using OpenAI
     const systemPrompt = `Extract structured information from this resume text and return as JSON:
@@ -50,7 +58,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: resumeText }
@@ -60,8 +68,11 @@ serve(async (req) => {
       }),
     })
 
+    console.log('✅ OpenAI API call successful');
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`)
+      const errorText = await response.text();
+      console.error('❌ OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`)
     }
 
     const openaiResult = await response.json()
