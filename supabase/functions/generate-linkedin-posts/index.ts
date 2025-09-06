@@ -56,13 +56,12 @@ Return as JSON array with objects containing: { tone, hook, body, cta }`
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.8,
-        max_tokens: 2000,
+        max_completion_tokens: 2000,
       }),
     })
 
