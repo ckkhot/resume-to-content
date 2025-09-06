@@ -57,15 +57,23 @@ export const LinkedInPostGenerator = () => {
 
       const posts = data.posts || [];
       setGeneratedPosts(posts);
-      setMessages(prev => [...prev, { 
-        type: 'assistant', 
-        content: `I've generated ${posts.length} LinkedIn posts in different tones based on your prompt. Each includes a compelling hook, narrative body, and engaging CTA.` 
-      }]);
+      
+      if (posts.length > 0) {
+        setMessages(prev => [...prev, { 
+          type: 'assistant', 
+          content: `I've generated ${posts.length} LinkedIn posts in different tones based on your ${resumeData ? 'resume data and ' : ''}prompt. Each includes a compelling hook, narrative body, and engaging CTA.` 
+        }]);
+      } else {
+        setMessages(prev => [...prev, { 
+          type: 'assistant', 
+          content: 'I generated content but encountered an issue formatting the posts. Please try again with a different prompt.' 
+        }]);
+      }
     } catch (error) {
       console.error('Error generating posts:', error);
       setMessages(prev => [...prev, { 
         type: 'assistant', 
-        content: 'Sorry, I encountered an error generating posts. Please try again.' 
+        content: 'Sorry, I encountered an error generating posts. Please check your connection and try again. If the issue persists, try a simpler prompt.' 
       }]);
     } finally {
       setIsGenerating(false);
@@ -103,8 +111,13 @@ export const LinkedInPostGenerator = () => {
           <div className="lg:col-span-1">
             <ResumeUpload 
               onUploadComplete={(data) => {
-                setResumeUploaded(true);
-                setResumeData(data);
+                if (data) {
+                  setResumeUploaded(true);
+                  setResumeData(data);
+                } else {
+                  setResumeUploaded(false);
+                  setResumeData(null);
+                }
               }}
               isUploaded={resumeUploaded}
             />

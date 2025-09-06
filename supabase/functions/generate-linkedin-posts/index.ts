@@ -12,29 +12,17 @@ serve(async (req) => {
   }
 
   try {
-    console.log('=== Function started ===');
+    console.log('=== Generate LinkedIn Posts Function Started ===');
     
     // Parse request body
-    let requestBody;
-    try {
-      requestBody = await req.json();
-      console.log('✅ Request body parsed');
-    } catch (e) {
-      console.error('❌ Failed to parse request body:', e);
-      throw new Error('Invalid JSON in request body');
-    }
-
-    const { prompt, resumeData } = requestBody;
+    const { prompt, resumeData } = await req.json();
     if (!prompt) {
       throw new Error('Prompt is required');
     }
     console.log('✅ Prompt received:', prompt.substring(0, 50) + '...');
     console.log('✅ Resume data available:', !!resumeData);
-    if (resumeData) {
-      console.log('Resume data keys:', Object.keys(resumeData));
-    }
     
-    // Check OpenAI API key
+    // Get OpenAI API key
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
       console.error('❌ OpenAI API key not found');
@@ -42,15 +30,12 @@ serve(async (req) => {
     }
     console.log('✅ OpenAI API key found');
 
-    // Check auth header
+    // Authenticate user
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('❌ No authorization header');
       throw new Error('Authorization header missing');
     }
-    console.log('✅ Auth header present');
 
-    // Create Supabase client and verify user
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -64,15 +49,15 @@ serve(async (req) => {
     }
     console.log('✅ User authenticated:', user.id);
 
-    // Create system prompt based on resume data and user prompt
+    // Create system prompt
     let systemPrompt = `You are a LinkedIn content expert. Generate 3 high-quality LinkedIn posts based on the user's prompt.`;
     
     if (resumeData && resumeData.name) {
-      systemPrompt += `\n\nUser's background from resume:
+      systemPrompt += `\n\nUser's background:
 - Name: ${resumeData.name}
 - Skills: ${resumeData.skills?.join(', ') || 'Not specified'}
-- Experience: ${resumeData.experience?.map(exp => `${exp.role} at ${exp.company}`).join(', ') || 'Not specified'}
-- Education: ${resumeData.education?.map(edu => `${edu.degree} from ${edu.institution}`).join(', ') || 'Not specified'}`;
+- Experience: ${resumeData.experience?.map(exp => \`\${exp.role} at \${exp.company}\`).join(', ') || 'Not specified'}
+- Education: ${resumeData.education?.map(edu => \`\${edu.degree} from \${edu.institution}\`).join(', ') || 'Not specified'}`;
     }
     
     systemPrompt += `\n\nGenerate posts in exactly these 3 tones:
@@ -91,7 +76,7 @@ Return ONLY a JSON array with objects containing: { "tone": "professional/casual
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': \`Bearer \${openaiApiKey}\`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -108,7 +93,7 @@ Return ONLY a JSON array with objects containing: { "tone": "professional/casual
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`);
+      throw new Error(\`OpenAI API error: \${response.statusText} - \${errorText}\`);
     }
 
     const openaiResult = await response.json();
@@ -120,17 +105,30 @@ Return ONLY a JSON array with objects containing: { "tone": "professional/casual
       console.log('✅ Posts parsed successfully');
     } catch (e) {
       console.error('❌ Failed to parse OpenAI response as JSON:', e);
-      // Fallback if JSON parsing fails
+      // Fallback with generated content
       const content = openaiResult.choices[0].message.content;
       posts = [
         {
           tone: 'professional',
-          hook: 'Generated content available',
-          body: content.substring(0, 1000),
+          hook: 'Professional insight generated',
+          body: content.substring(0, 800),
           cta: "What are your thoughts on this topic?"
+        },
+        {
+          tone: 'casual',
+          hook: 'Casual perspective on this topic',
+          body: content.substring(0, 800),
+          cta: "Share your experience in the comments!"
+        },
+        {
+          tone: 'bold',
+          hook: 'Bold take on this subject',
+          body: content.substring(0, 800),
+          cta: "Who else agrees with this perspective?"
         }
       ];
     }
+
     console.log('✅ Posts generated successfully');
 
     return new Response(

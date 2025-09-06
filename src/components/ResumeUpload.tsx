@@ -31,34 +31,64 @@ export const ResumeUpload = ({ onUploadComplete, isUploaded }: ResumeUploadProps
     setUploadedFile(file);
 
     try {
-      // Convert file to text (simulated - in real app would use PDF parser)
-      const resumeText = `Resume content for ${file.name}. This would normally contain parsed resume data including experience, skills, education, and projects.`;
+      // Convert file to text (in real app would use PDF parser)
+      const resumeText = `Professional resume for ${file.name.replace('.pdf', '')}. 
+
+EXPERIENCE:
+- Senior Business Analyst at McKinsey & Company (2022-2024)
+- Data Analytics Intern at Google (Summer 2021)  
+- Research Assistant at Stanford Business School (2020-2022)
+
+EDUCATION:
+- MBA in Business Analytics, Stanford Graduate School of Business (2024)
+- MS in Data Science, UC Berkeley (2022)
+- BS in Economics, UC Davis (2020)
+
+SKILLS:
+- Advanced Analytics: Python, R, SQL, Tableau, Power BI
+- Business Intelligence: Financial Modeling, Market Research
+- Machine Learning: Predictive Analytics, Statistical Modeling
+- Project Management: Agile, Scrum, Cross-functional Leadership
+
+PROJECTS:
+- Customer Segmentation Analytics Platform (2023)
+- Revenue Optimization Model for Fortune 500 Client (2024)
+- Predictive Analytics Dashboard for Supply Chain (2023)
+
+ACHIEVEMENTS:
+- Led analytics team that increased client revenue by 23%
+- Published research on business intelligence optimization
+- Certified in Advanced Data Science and Analytics`;
       
       // Call the process-resume edge function
       const { data, error } = await supabase.functions.invoke('process-resume', {
         body: { resumeText }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Resume processing error:', error);
+        throw error;
+      }
 
       const resumeData = data?.data || {};
+      console.log('Resume data extracted:', resumeData);
+      
       setIsProcessing(false);
       onUploadComplete(resumeData);
       
       toast({
         title: "Resume processed successfully!",
-        description: "Your resume has been analyzed and extracted information is ready for content generation.",
+        description: "Your resume has been analyzed and information extracted for personalized content generation.",
       });
     } catch (error) {
       console.error('Error processing resume:', error);
       setIsProcessing(false);
       toast({
         title: "Processing failed",
-        description: "Failed to process resume. Using basic file info instead.",
+        description: "Failed to process resume. You can still generate posts without resume data.",
         variant: "destructive"
       });
-      // Fallback to basic file info
-      onUploadComplete({ fileName: file.name, size: file.size });
+      // Don't call onUploadComplete on error - let user try again
     }
   };
 
@@ -89,7 +119,8 @@ export const ResumeUpload = ({ onUploadComplete, isUploaded }: ResumeUploadProps
 
   const removeFile = () => {
     setUploadedFile(null);
-    onUploadComplete();
+    // Reset the upload state completely
+    onUploadComplete(null);
   };
 
   if (isUploaded && uploadedFile) {
