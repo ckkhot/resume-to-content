@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, Send, User, Brain, Zap } from "lucide-react";
 import { PostOutput } from "./PostOutput";
 import { ResumeUpload } from "./ResumeUpload";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface GeneratedPost {
   hook: string;
@@ -64,14 +65,17 @@ export const LinkedInPostGenerator = () => {
       {/* Header */}
       <header className="border-b border-tech-border bg-surface">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Brain className="h-6 w-6 text-tech-primary" />
-              <h1 className="text-xl font-bold text-tech-primary">0.1% GPT</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Brain className="h-6 w-6 text-tech-primary" />
+                <h1 className="text-xl font-bold text-tech-primary">0.1% GPT</h1>
+              </div>
+              <div className="text-xs text-muted-foreground bg-tech-accent px-2 py-1 rounded">
+                LinkedIn Post Generator
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground bg-tech-accent px-2 py-1 rounded">
-              LinkedIn Post Generator
-            </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
