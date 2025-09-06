@@ -174,8 +174,8 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
   const isUCDavis = education.institution?.includes('UC Davis') || education.institution?.includes('Davis');
   const isAnalytics = skills.some(s => s.toLowerCase().includes('analytics')) || education.degree?.includes('Analytics');
   
-  // Analyze prompt for key themes
-  const promptLower = prompt.toLowerCase();
+  // Analyze prompt for key themes with null safety
+  const promptLower = (prompt || '').toLowerCase();
   const isGraduation = promptLower.includes('grad') || promptLower.includes('graduation') || promptLower.includes('degree');
   const isJobSearch = promptLower.includes('job') || promptLower.includes('opportunity') || promptLower.includes('career');
   const isAI = promptLower.includes('ai') || promptLower.includes('artificial intelligence') || promptLower.includes('machine learning');
@@ -271,8 +271,8 @@ function generateContextualHook(tone: string, context: any): string {
   const randomSurprise = surprises[(uniqueId + seed) % surprises.length];
   const randomControversial = controversials[uniqueId % controversials.length];
   
-  // Extract random words from prompt for dynamic integration
-  const promptWords = prompt.split(' ').filter(word => word.length > 3);
+  // Extract random words from prompt for dynamic integration with null safety
+  const promptWords = (prompt || '').split(' ').filter(word => word.length > 3);
   const randomPromptWord = promptWords.length > 0 ? promptWords[uniqueId % promptWords.length] : 'professional growth';
   
   // Generate completely dynamic content based on tone and context
@@ -280,7 +280,7 @@ function generateContextualHook(tone: string, context: any): string {
     const professional_starters = [
       `${randomTimeframe} in ${randomPromptWord} has fundamentally changed my approach to ${focus}.`,
       `My journey through ${isUCDavis ? 'UC Davis and ' : ''}${randomPromptWord} ${randomInsight} that success requires ${focus}.`,
-      `After ${randomTimeframe.toLowerCase()} of ${prompt.toLowerCase()}, I've discovered what truly drives ${focus}.`,
+      `After ${randomTimeframe.toLowerCase()} of ${(prompt || 'professional development').toLowerCase()}, I've discovered what truly drives ${focus}.`,
       `The intersection of ${randomPromptWord} and ${focus} is creating opportunities I never expected.`,
       `Working in ${randomPromptWord} has ${randomInsight} that ${focus} isn't what most people think.`
     ];
@@ -290,7 +290,7 @@ function generateContextualHook(tone: string, context: any): string {
   if (tone === 'casual') {
     const casual_starters = [
       `${randomSurprise} ${randomTimeframe} of ${randomPromptWord} and I finally get why ${focus} matters.`,
-      `Just spent ${randomTimeframe.toLowerCase()} in ${prompt.toLowerCase()} and here's what nobody tells you.`,
+      `Just spent ${randomTimeframe.toLowerCase()} in ${(prompt || 'professional development').toLowerCase()} and here's what nobody tells you.`,
       `${randomSurprise} The hardest part of ${randomPromptWord} isn't the technical stuff.`,
       `Six months ago I thought ${randomPromptWord} was about X. Turns out it's all about ${focus}.`,
       `${randomSurprise} ${randomPromptWord} ${randomInsight} me more about ${focus} than I expected.`
@@ -331,8 +331,8 @@ function generateContextualBody(tone: string, context: any): string {
   const randomLearning = learnings[(uniqueId + seed) % learnings.length];
   const randomInsight = insights[uniqueId % insights.length];
   
-  // Extract and use prompt context dynamically
-  const promptWords = prompt.split(' ').filter(word => word.length > 3);
+  // Extract and use prompt context dynamically with null safety
+  const promptWords = (prompt || '').split(' ').filter(word => word.length > 3);
   const keyWord = promptWords.length > 0 ? promptWords[uniqueId % promptWords.length] : 'professional development';
   
   if (tone === 'professional') {
@@ -463,7 +463,7 @@ The future belongs to professionals who can bridge the gap between technical cap
   }
   
   // Fallback return
-  return `After working in ${prompt.toLowerCase()} for the past few years, I've come to a controversial conclusion: we're solving the wrong problems.\n\nWhat the industry gets wrong:\n\n• Obsession with technical complexity over business simplicity\n• Building solutions that impress other technologists but confuse customers\n• Focusing on what's technically possible instead of what's actually needed\n• Treating ${skillsList} as the end goal rather than the means to solve real problems\n\nThe most successful professionals I know aren't the ones with the most impressive technical portfolios. They're the ones who can take complex capabilities and apply them to solve simple, valuable business problems.`;
+  return `After working in ${(prompt || 'professional development').toLowerCase()} for the past few years, I've come to a controversial conclusion: we're solving the wrong problems.\n\nWhat the industry gets wrong:\n\n• Obsession with technical complexity over business simplicity\n• Building solutions that impress other technologists but confuse customers\n• Focusing on what's technically possible instead of what's actually needed\n• Treating ${skillsList} as the end goal rather than the means to solve real problems\n\nThe most successful professionals I know aren't the ones with the most impressive technical portfolios. They're the ones who can take complex capabilities and apply them to solve simple, valuable business problems.`;
 }
 
 function generateContextualCTA(tone: string, context: any): string {
@@ -485,7 +485,7 @@ function generateContextualCTA(tone: string, context: any): string {
   if (tone === 'professional') {
     const professionalCTAs = [
       `${randomQuestion} with ${focus} in your professional journey? I'd welcome insights from fellow professionals.`,
-      `Fellow professionals - ${randomQuestion.toLowerCase()} ${randomTopic} and ${focus}? ${randomEngagement}`,
+      `Fellow professionals - ${(randomQuestion || 'What has been your experience').toLowerCase()} ${randomTopic} and ${focus}? ${randomEngagement}`,
       `${randomQuestion} balancing technical excellence with ${focus}? Looking forward to your perspectives.`,
       `What strategies have proven most effective for achieving ${focus} in your field? ${randomEngagement}`,
       `How do you approach ${randomTopic} while maintaining focus on ${focus}? Interested in your approaches.`
@@ -496,7 +496,7 @@ function generateContextualCTA(tone: string, context: any): string {
   if (tone === 'casual') {
     const casualCTAs = [
       `${randomQuestion} with ${randomTopic}? ${randomEngagement}`,
-      `Fellow professionals - ${randomQuestion.toLowerCase()} ${focus} in your day-to-day work?`,
+      `Fellow professionals - ${(randomQuestion || 'What has been your experience').toLowerCase()} ${focus} in your day-to-day work?`,
       `Anyone else dealing with ${randomTopic}? What's working for you?`,
       `${randomQuestion} navigating ${focus}? Drop your stories below!`,
       `What's your take on ${randomTopic} and ${focus}? ${randomEngagement}`
