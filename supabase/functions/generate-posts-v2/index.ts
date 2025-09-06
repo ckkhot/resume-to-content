@@ -419,9 +419,10 @@ The professionals who get promoted aren't always the most technically skilled. T
     return casualBodies[uniqueId % casualBodies.length];
   }
   
-  // Bold tone
-  const boldBodies = [
-    `After working in ${keyWord} for years, I've come to a controversial conclusion: the industry has ${focus} completely backwards.
+  // Bold tone  
+  if (tone === 'bold') {
+    const boldBodies = [
+      `After working in ${keyWord} for years, I've come to a controversial conclusion: the industry has ${focus} completely backwards.
 
 What we get wrong:
 
@@ -433,7 +434,7 @@ What we get wrong:
 
 The most successful professionals I know aren't the ones with the most impressive technical skills. They're the ones who can take complex ${skillsList} and apply them to create simple, valuable ${randomOutcome}.`,
 
-    `The ${keyWord} industry has convinced everyone they need more ${skillsList} when they really need better ${focus}.
+      `The ${keyWord} industry has convinced everyone they need more ${skillsList} when they really need better ${focus}.
 
 Hard truths about ${focus}:
 
@@ -445,7 +446,7 @@ Hard truths about ${focus}:
 
 We're optimizing for the wrong metrics while the real drivers of ${randomOutcome} go ignored.`,
 
-    `Unpopular opinion: The ${keyWord} field is broken because we prioritize ${skillsList} over ${focus}.
+      `Unpopular opinion: The ${keyWord} field is broken because we prioritize ${skillsList} over ${focus}.
 
 What needs to change:
 
@@ -456,49 +457,12 @@ What needs to change:
 • Measure impact by ${randomOutcome}, not technical sophistication
 
 The future belongs to professionals who can bridge the gap between technical capability and real-world ${focus}.`
-  ];
-  
-  return boldBodies[uniqueId % boldBodies.length];
-}
-  const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt, seed, variation, focus } = context;
-  
-  const skillsList = skills.length > 0 ? skills.slice(0, 4).join(', ') : 'technical and analytical skills';
-  const degree = education.degree || 'graduate program';
-  const institution = education.institution || 'university';
-  
-  if (tone === 'professional') {
-    if (isGraduation && isUCDavis) {
-      return `My experience at UC Davis pursuing a ${degree} has reinforced that success in today's market requires more than technical proficiency.\n\nKey insights from my academic and professional journey:\n\n• ${skillsList} are essential, but business acumen drives real impact\n• Cross-functional collaboration multiplies individual expertise\n• Understanding stakeholder needs is as critical as technical execution\n• Real-world applications often differ significantly from academic models\n\nThe most valuable professionals bridge the gap between technical capability and strategic business outcomes.`;
-    }
+    ];
     
-    if (isJobSearch && isAI) {
-      return `As someone with expertise in ${skillsList}, I've observed that the most successful AI implementations focus on solving specific business problems rather than showcasing technology.\n\nWhat separates successful AI professionals:\n\n• Deep understanding of business context and customer needs\n• Ability to translate complex technical concepts for stakeholders\n• Focus on measurable business outcomes over algorithmic sophistication\n• Strong communication and project management capabilities\n\nThe future belongs to those who can combine technical expertise with strategic business thinking.`;
-    }
-    
-    return `Through my work with ${skillsList} and experience in ${prompt.toLowerCase()}, I've learned that sustainable success requires a multifaceted approach.\n\nCritical success factors I've identified:\n\n• Technical excellence as the foundation, not the ceiling\n• Continuous learning and adaptation to industry changes\n• Building strong professional networks and mentor relationships\n• Understanding the broader business context of technical decisions\n\nThe professionals who thrive are those who combine deep expertise with broad business understanding.`;
+    return boldBodies[uniqueId % boldBodies.length];
   }
   
-  if (tone === 'casual') {
-    if (isGraduation && isUCDavis) {
-      return `UC Davis taught me ${skillsList}, but the working world is teaching me everything else.\n\nWhat my ${degree} didn't prepare me for:\n\n• How messy real-world data actually is\n• The amount of time spent explaining technical concepts to non-technical stakeholders\n• How much politics and relationship-building matter\n• That soft skills often matter more than technical skills for career advancement\n\nTurns out ${isAnalytics ? 'the algorithms were the easy part' : 'the technical knowledge was just the entry fee'}. The human element is where the real challenge lies.`;
-    }
-    
-    if (isJobSearch && isAI) {
-      return `Everyone's talking about AI taking jobs, but I'm seeing the opposite - it's creating entirely new types of opportunities.\n\nWhat I've learned about ${isAI ? 'AI and growth' : prompt} roles:\n\n• Companies need people who can bridge technical and business teams\n• Understanding customer problems is more valuable than knowing every algorithm\n• Communication skills are just as important as ${skillsList}\n• The best opportunities are in companies that see AI as a business tool, not just tech\n\nThe sweet spot is being technical enough to understand the possibilities but business-minded enough to focus on what actually matters.`;
-    }
-    
-    return `Starting my career, I thought success was all about mastering ${skillsList}. Three years later, I've learned the real game is much more complex.\n\nWhat actually matters in ${prompt.toLowerCase()}:\n\n• Building relationships across different departments\n• Understanding the business impact of your technical work\n• Being able to explain complex concepts simply\n• Knowing when to say no to technically interesting but business-irrelevant projects\n\nTechnical skills got me in the door. Everything else is keeping me valuable.`;
-  }
-  
-  // Bold tone
-  if (isGraduation) {
-    return `Just finished my ${degree} at ${institution} and I'm convinced that higher education is failing to prepare students for the reality of modern work.\n\nWhat's broken in ${isAnalytics ? 'analytics' : 'graduate'} education:\n\n• Too much focus on perfect, clean datasets that don't exist in the real world\n• Zero emphasis on stakeholder management and organizational politics\n• Obsession with complex models when simple solutions drive more business value\n• Complete lack of training in communication and change management\n\n${isUCDavis ? 'UC Davis gave me solid technical foundations' : 'My program taught valuable concepts'}, but the real education starts when you realize that ${skillsList} are just table stakes. We need to completely reimagine how we prepare people for careers in ${isAnalytics ? 'data-driven' : 'technical'} roles.`;
-  }
-  
-  if (isJobSearch && isAI) {
-    return `Everyone's rushing to add AI to their resume without understanding what actually creates business value.\n\nThe harsh reality about AI and growth roles:\n\n• 90% of AI projects fail because they solve the wrong problems\n• Companies are hiring for AI expertise but what they really need is business problem-solving\n• Most AI implementations are expensive solutions looking for problems\n• The real opportunities are in companies that understand AI is a means, not an end\n\nWe need fewer people building impressive models and more people who can identify where AI actually drives business outcomes. My ${skillsList} background taught me that the most sophisticated solution is usually the wrong one.`;
-  }
-  
+  // Fallback return
   return `After working in ${prompt.toLowerCase()} for the past few years, I've come to a controversial conclusion: we're solving the wrong problems.\n\nWhat the industry gets wrong:\n\n• Obsession with technical complexity over business simplicity\n• Building solutions that impress other technologists but confuse customers\n• Focusing on what's technically possible instead of what's actually needed\n• Treating ${skillsList} as the end goal rather than the means to solve real problems\n\nThe most successful professionals I know aren't the ones with the most impressive technical portfolios. They're the ones who can take complex capabilities and apply them to solve simple, valuable business problems.`;
 }
 
