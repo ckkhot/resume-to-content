@@ -189,25 +189,45 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
     Math.floor(Math.random() * 3)
   ];
   
-  // Create unique context for each post with random variations
+  // Force different variations for each post to ensure uniqueness
+  const uniqueVariations = [
+    Math.floor(Math.random() * 3),
+    Math.floor(Math.random() * 3),
+    Math.floor(Math.random() * 3)
+  ];
+  
+  // Ensure all three are different
+  while (uniqueVariations[1] === uniqueVariations[0]) {
+    uniqueVariations[1] = Math.floor(Math.random() * 3);
+  }
+  while (uniqueVariations[2] === uniqueVariations[0] || uniqueVariations[2] === uniqueVariations[1]) {
+    uniqueVariations[2] = Math.floor(Math.random() * 3);
+  }
+  
+  console.log(`🎯 Forcing unique variations: ${uniqueVariations.join(', ')}`);
+  
+  // Create unique context for each post with guaranteed different variations
   const contexts = [
     { 
       tone: 'professional', 
       seed: sessionSeed + Math.floor(Math.random() * 100),
-      variation: randomVariations[0],
-      focus: isJobSearch ? 'strategy' : isGraduation ? 'learning' : 'expertise'
+      variation: uniqueVariations[0],
+      focus: isJobSearch ? 'strategy' : isGraduation ? 'learning' : 'expertise',
+      randomSalt: Math.floor(Math.random() * 1000)
     },
     { 
       tone: 'casual', 
       seed: sessionSeed + Math.floor(Math.random() * 100) + 50,
-      variation: randomVariations[1],
-      focus: isWork ? 'experience' : isAI ? 'innovation' : 'journey'
+      variation: uniqueVariations[1],
+      focus: isWork ? 'experience' : isAI ? 'innovation' : 'journey',
+      randomSalt: Math.floor(Math.random() * 1000)
     },
     { 
       tone: 'bold', 
       seed: sessionSeed + Math.floor(Math.random() * 100) + 100,
-      variation: randomVariations[2],
-      focus: isAnalytics ? 'disruption' : isGrowth ? 'transformation' : 'breakthrough'
+      variation: uniqueVariations[2],
+      focus: isAnalytics ? 'disruption' : isGrowth ? 'transformation' : 'breakthrough',
+      randomSalt: Math.floor(Math.random() * 1000)
     }
   ];
   
@@ -228,7 +248,7 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
     })
   }));
   
-  console.log(`✅ Generated 3 unique fallback posts with random variations: ${randomVariations.join(', ')}`);
+  console.log(`✅ Generated 3 unique fallback posts with guaranteed different variations: ${uniqueVariations.join(', ')}`);
   return posts;
 }
 
