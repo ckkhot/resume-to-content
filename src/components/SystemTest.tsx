@@ -14,16 +14,20 @@ export const SystemTest = () => {
     try {
       console.log('Running system test...');
       
-      // Test the test function first
-      const { data, error } = await supabase.functions.invoke('test-function', {
-        body: { test: 'system check' }
+      // Test the OpenAI connection first
+      const { data: openaiData, error: openaiError } = await supabase.functions.invoke('test-openai', {
+        body: { test: 'openai check' }
       });
 
-      if (error) {
-        setTestResults({ error: error.message, type: 'test-function-error' });
+      let results = { openai: {} };
+      
+      if (openaiError) {
+        results.openai = { error: openaiError.message, type: 'openai-error' };
       } else {
-        setTestResults({ ...data, type: 'test-function-success' });
+        results.openai = { ...openaiData, type: 'openai-success' };
       }
+
+      setTestResults(results);
 
     } catch (error) {
       console.error('System test error:', error);
