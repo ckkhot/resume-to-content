@@ -2,41 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Tech Futuristic Design System - Minimal Black/White Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Core Colors - Tech Monochrome */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 5%;
+    --surface: 0 0% 100%;
+    --surface-muted: 0 0% 96%;
+    
+    /* Tech Accent */
+    --tech-primary: 0 0% 0%;
+    --tech-secondary: 0 0% 15%;
+    --tech-accent: 0 0% 85%;
+    --tech-border: 0 0% 88%;
+    
+    /* Interactive States */
+    --hover-surface: 0 0% 94%;
+    --active-surface: 0 0% 90%;
+    
+    /* Semantic UI Colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 0 0% 5%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
+    --popover-foreground: 0 0% 5%;
+    --primary: 0 0% 5%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 15%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 0 0% 15%;
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 88%;
+    --input: 0 0% 96%;
+    --ring: 0 0% 15%;
     --radius: 0.5rem;
+    
+    /* Tech Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 5%) 0%, hsl(0 0% 15%) 100%);
+    --gradient-surface: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
+    --gradient-border: linear-gradient(90deg, hsl(0 0% 88%) 0%, hsl(0 0% 92%) 50%, hsl(0 0% 88%) 100%);
+    
+    /* Tech Shadows */
+    --shadow-tech: 0 2px 20px -5px hsl(0 0% 0% / 0.1);
+    --shadow-tech-lg: 0 10px 40px -15px hsl(0 0% 0% / 0.15);
+    --shadow-glow: 0 0 30px hsl(0 0% 0% / 0.05);
+    
+    /* Animation Variables */
+    --transition-tech: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease-out;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +118,83 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
+  }
+}
+
+@layer components {
+  /* Tech Button Variants */
+  .btn-tech {
+    @apply bg-gradient-to-r from-tech-primary to-tech-secondary text-primary-foreground;
+    @apply border border-tech-border shadow-tech;
+    @apply transition-all duration-300 hover:shadow-tech-lg;
+  }
+  
+  .btn-ghost-tech {
+    @apply border border-tech-border bg-transparent text-foreground;
+    @apply hover:bg-hover-surface transition-all duration-200;
+  }
+  
+  /* Chat Interface Components */
+  .chat-message {
+    @apply bg-surface border border-tech-border rounded-lg p-4;
+    @apply shadow-tech transition-all duration-200;
+  }
+  
+  .chat-message.user {
+    @apply bg-tech-accent text-foreground ml-auto max-w-[80%];
+  }
+  
+  .chat-message.assistant {
+    @apply bg-surface text-foreground mr-auto max-w-[90%];
+  }
+  
+  /* Post Card Variants */
+  .post-card {
+    @apply bg-surface border border-tech-border rounded-lg;
+    @apply shadow-tech hover:shadow-tech-lg transition-all duration-300;
+  }
+  
+  .post-card.professional {
+    @apply border-l-4 border-l-tech-primary;
+  }
+  
+  .post-card.casual {
+    @apply border-l-4 border-l-tech-accent;
+  }
+  
+  .post-card.bold {
+    @apply border-l-4 border-l-tech-secondary;
+  }
+  
+  /* Tech Input */
+  .input-tech {
+    @apply bg-input border-tech-border focus:border-tech-primary;
+    @apply transition-all duration-200 focus:shadow-glow;
+  }
+  
+  /* Futuristic Grid */
+  .tech-grid {
+    background-image: 
+      linear-gradient(hsl(var(--tech-border)) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--tech-border)) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  /* Animated Gradient Border */
+  .gradient-border {
+    position: relative;
+    background: hsl(var(--surface));
+  }
+  
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    background: var(--gradient-border);
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
   }
 }

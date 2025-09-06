@@ -24,6 +24,14 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				surface: 'hsl(var(--surface))',
+				'surface-muted': 'hsl(var(--surface-muted))',
+				'tech-primary': 'hsl(var(--tech-primary))',
+				'tech-secondary': 'hsl(var(--tech-secondary))',
+				'tech-accent': 'hsl(var(--tech-accent))',
+				'tech-border': 'hsl(var(--tech-border))',
+				'hover-surface': 'hsl(var(--hover-surface))',
+				'active-surface': 'hsl(var(--active-surface))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -88,8 +96,15 @@ export default {
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fadeIn 0.3s ease-out',
+				'slide-up': 'slideUp 0.3s ease-out',
+				'pulse-tech': 'pulseTech 2s infinite'
 			}
+		},
+		fontFamily: {
+			mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+			sans: ['Inter', 'system-ui', 'sans-serif']
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
