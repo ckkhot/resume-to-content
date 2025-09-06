@@ -8,6 +8,7 @@ import { ResumeUpload } from "./ResumeUpload";
 import { ThemeToggle } from "./ThemeToggle";
 import { Auth } from "./Auth";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase";
 
 interface GeneratedPost {
   hook: string;
@@ -42,37 +43,33 @@ export const LinkedInPostGenerator = () => {
     setIsGenerating(true);
     setMessages(prev => [...prev, { type: 'user', content: prompt }]);
     
-    // Simulate API call - replace with actual implementation
-    setTimeout(() => {
-      const mockPosts: GeneratedPost[] = [
-        {
-          tone: 'professional',
-          hook: "🎯 After analyzing 100+ student LinkedIn profiles, I discovered the #1 mistake 90% make...",
-          body: "Most students focus on listing their achievements instead of demonstrating their problem-solving mindset.\n\nHere's what I learned during my internship at [Company]:\n→ Always frame experiences as solutions\n→ Quantify your impact with real numbers\n→ Show progression, not just participation\n\nThe difference? Employers see potential, not just performance.",
-          cta: "What's been your biggest learning curve in building your professional brand? Share below! 👇"
-        },
-        {
-          tone: 'casual',
-          hook: "Plot twist: The best career advice I got wasn't from a mentor... it was from a failed project 🤯",
-          body: "Last semester, our team's app completely crashed during the final demo. Embarrassing? Absolutely.\n\nBut here's what that failure taught me:\n• Resilience beats perfection every time\n• Documentation saves lives (and grades)\n• Team communication is everything\n• Backup plans need backup plans\n\nThat 'failed' project became my favorite interview story.",
-          cta: "Anyone else have a failure that turned into their biggest win? Let's normalize learning from setbacks! 💪"
-        },
-        {
-          tone: 'bold',
-          hook: "🚨 UNPOPULAR OPINION: Your GPA matters less than your GitHub activity (and here's the data to prove it)",
-          body: "I surveyed 50 tech recruiters last month. The results were shocking:\n\n📊 78% check GitHub before looking at grades\n📊 65% value project complexity over academic scores\n📊 91% prefer seeing consistent contribution patterns\n\nTranslation: Stop obsessing over that B+ and start building. Your future employer cares more about what you create than what you memorize.",
-          cta: "Agree or disagree? Drop your hot takes below! The comment section is about to get spicy 🔥"
+    try {
+      // Call Supabase Edge Function to generate posts
+      const { data, error } = await supabase.functions.invoke('generate-linkedin-posts', {
+        body: { 
+          prompt: prompt,
+          resumeData: null // Will be populated when resume processing is implemented
         }
-      ];
-      
-      setGeneratedPosts(mockPosts);
+      });
+
+      if (error) throw error;
+
+      const posts = data.posts || [];
+      setGeneratedPosts(posts);
       setMessages(prev => [...prev, { 
         type: 'assistant', 
-        content: "I've generated 3 LinkedIn posts in different tones based on your resume and prompt. Each includes a compelling hook, narrative body, and engaging CTA." 
+        content: `I've generated ${posts.length} LinkedIn posts in different tones based on your prompt. Each includes a compelling hook, narrative body, and engaging CTA.` 
       }]);
+    } catch (error) {
+      console.error('Error generating posts:', error);
+      setMessages(prev => [...prev, { 
+        type: 'assistant', 
+        content: 'Sorry, I encountered an error generating posts. Please try again.' 
+      }]);
+    } finally {
       setIsGenerating(false);
       setPrompt("");
-    }, 2000);
+    }
   };
 
   return (
