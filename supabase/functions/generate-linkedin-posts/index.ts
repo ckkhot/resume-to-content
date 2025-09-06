@@ -74,27 +74,27 @@ serve(async (req) => {
 The journey to get here involved countless hours of skill development, networking, and perseverance. Every rejection taught me something new, and every small win built momentum toward this moment.
 
 I'm grateful for the mentors, peers, and experiences that shaped this path. Sometimes the best opportunities come when preparation meets possibility.`,
-        cta: 'What\\'s been your biggest career breakthrough this year? Share your story below! 👇'
+        cta: "What's been your biggest career breakthrough this year? Share your story below! 👇"
       },
       {
         tone: 'casual',
         hook: 'Plot twist: Dreams do come true! ✨',
-        body: `Okay, I literally can\\'t contain my excitement right now. Just got the call - I landed an internship at a YC company working on analytics and AI! 🤯
+        body: `Okay, I literally can't contain my excitement right now. Just got the call - I landed an internship at a YC company working on analytics and AI! 🤯
 
 Still feels surreal. All those late nights grinding on projects, the nerve-wracking interviews, the moments of self-doubt... it all led to this. Sometimes the universe really does reward hard work and persistence.
 
 This is just the beginning, but wow - what a beginning it is. Ready to learn, contribute, and maybe even change the world a little bit along the way.`,
-        cta: 'Drop a 🔥 if you believe persistence pays off! Let\\'s celebrate wins together 🎉'
+        cta: "Drop a 🔥 if you believe persistence pays off! Let's celebrate wins together 🎉"
       },
       {
         tone: 'bold',
         hook: 'Breaking: The future just got brighter! 🚀',
-        body: `NEWS FLASH: Your girl just secured an internship at a Y Combinator analytics and AI company! This isn\\'t just a job - it\\'s a launching pad into the future of technology.
+        body: `NEWS FLASH: Your girl just secured an internship at a Y Combinator analytics and AI company! This isn't just a job - it's a launching pad into the future of technology.
 
-Here\\'s what this means: I\\'ll be working alongside brilliant minds, solving problems that matter, and contributing to innovations that could shape entire industries. The learning curve will be steep, but that\\'s exactly where I thrive.
+Here's what this means: I'll be working alongside brilliant minds, solving problems that matter, and contributing to innovations that could shape entire industries. The learning curve will be steep, but that's exactly where I thrive.
 
-To everyone who said "analytics and AI are too competitive" or "you need more experience" - watch this space. Sometimes you don\\'t wait for permission to level up. You create your own opportunities.\`,
-        cta: 'Who else is ready to disrupt their industry? Tag someone who needs to see this! 💪'
+To everyone who said "analytics and AI are too competitive" or "you need more experience" - watch this space. Sometimes you don't wait for permission to level up. You create your own opportunities.`,
+        cta: "Who else is ready to disrupt their industry? Tag someone who needs to see this! 💪"
       }
     ];
 
