@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, CheckCircle, X } from "lucide-react";
@@ -14,7 +14,13 @@ export const ResumeUpload = ({ onUploadComplete, isUploaded }: ResumeUploadProps
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const { toast } = useToast();
+
+  // Clear any error state on component mount
+  useEffect(() => {
+    setHasError(false);
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -28,6 +34,7 @@ export const ResumeUpload = ({ onUploadComplete, isUploaded }: ResumeUploadProps
 
   const processFile = async (file: File) => {
     setIsProcessing(true);
+    setHasError(false); // Reset error state
     setUploadedFile(file);
 
     try {
@@ -83,11 +90,16 @@ ACHIEVEMENTS:
     } catch (error) {
       console.error('Error processing resume:', error);
       setIsProcessing(false);
-      toast({
-        title: "Resume processing failed",
-        description: "No worries! You can still generate amazing LinkedIn posts. Resume data helps personalize content, but isn't required.",
-        variant: "destructive"
-      });
+      setHasError(true);
+      
+      // Only show toast if this is an actual user-initiated upload
+      if (file) {
+        toast({
+          title: "Resume processing failed",
+          description: "No worries! You can still generate amazing LinkedIn posts. Resume data helps personalize content, but isn't required.",
+          variant: "destructive"
+        });
+      }
       // Don't call onUploadComplete on error - let user try again or proceed without resume
     }
   };
@@ -119,6 +131,7 @@ ACHIEVEMENTS:
 
   const removeFile = () => {
     setUploadedFile(null);
+    setHasError(false); // Reset error state
     // Reset the upload state completely
     onUploadComplete(null);
   };
