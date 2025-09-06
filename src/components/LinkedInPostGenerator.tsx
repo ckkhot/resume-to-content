@@ -46,8 +46,9 @@ export const LinkedInPostGenerator = () => {
     setMessages(prev => [...prev, { type: 'user', content: prompt }]);
     
     try {
-      // Call Supabase Edge Function to generate posts
-      const { data, error } = await supabase.functions.invoke('generate-linkedin-posts', {
+      // Call NEW Supabase Edge Function to generate posts
+      console.log('🚀 Calling generate-posts-v2 function...');
+      const { data, error } = await supabase.functions.invoke('generate-posts-v2', {
         body: { 
           prompt: prompt,
           resumeData: resumeData || null // Ensure we pass null if no resume data

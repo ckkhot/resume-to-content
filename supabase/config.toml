@@ -41,6 +41,9 @@ enable_confirmations = false
 [functions.generate-linkedin-posts]
 verify_jwt = true
 
+[functions.generate-posts-v2]
+verify_jwt = true
+
 [functions.process-resume]
 verify_jwt = true
 

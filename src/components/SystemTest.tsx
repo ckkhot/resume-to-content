@@ -46,7 +46,7 @@ export const SystemTest = () => {
     try {
       console.log('Testing post generation with timestamp:', Date.now());
       
-      const { data, error } = await supabase.functions.invoke('generate-linkedin-posts', {
+      const { data, error } = await supabase.functions.invoke('generate-posts-v2', {
         body: { 
           prompt: `Test prompt for debugging - ${Date.now()}`,
           resumeData: {
