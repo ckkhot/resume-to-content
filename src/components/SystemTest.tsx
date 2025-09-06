@@ -44,19 +44,34 @@ export const SystemTest = () => {
   const testPostGeneration = async () => {
     setIsRunning(true);
     try {
+      console.log('Testing post generation with timestamp:', Date.now());
+      
       const { data, error } = await supabase.functions.invoke('generate-linkedin-posts', {
         body: { 
-          prompt: 'test prompt for business analytics',
-          resumeData: null
+          prompt: `Test prompt for debugging - ${Date.now()}`,
+          resumeData: {
+            name: 'Test User',
+            skills: ['Analytics', 'Data Science'],
+            experience: [{ company: 'Test Co', role: 'Analyst', duration: '2023-2024' }]
+          }
         }
       });
 
+      console.log('Post generation response:', { data, error });
+
       if (error) {
-        setTestResults({ ...testResults, postGenError: error.message });
+        setTestResults({ ...testResults, postGenError: error.message, postGenTime: new Date().toISOString() });
       } else {
-        setTestResults({ ...testResults, postGenSuccess: data });
+        setTestResults({ 
+          ...testResults, 
+          postGenSuccess: data,
+          postGenTime: new Date().toISOString(),
+          usedOpenAI: data?.source === 'openai',
+          postsCount: data?.posts?.length || 0
+        });
       }
     } catch (error) {
+      console.error('Post generation test error:', error);
       setTestResults({ ...testResults, postGenClientError: error.message });
     } finally {
       setIsRunning(false);
