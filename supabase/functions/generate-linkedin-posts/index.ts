@@ -12,10 +12,13 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Function invoked');
     const { prompt, resumeData } = await req.json()
+    console.log('Request body parsed:', { prompt: prompt?.substring(0, 50) + '...', hasResumeData: !!resumeData });
     
     // Get OpenAI API key from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
+    console.log('OpenAI API key present:', !!openaiApiKey);
     if (!openaiApiKey) {
       throw new Error('OpenAI API key not found')
     }
@@ -49,6 +52,7 @@ Each post should have:
 
 Return as JSON array with objects containing: { tone, hook, body, cta }`
 
+    console.log('Making OpenAI API call...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -65,11 +69,15 @@ Return as JSON array with objects containing: { tone, hook, body, cta }`
       }),
     })
 
+    console.log('OpenAI response status:', response.status);
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`)
+      const errorText = await response.text();
+      console.error('OpenAI API error details:', errorText);
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`)
     }
 
     const openaiResult = await response.json()
+    console.log('OpenAI result received');
     let posts
 
     try {
