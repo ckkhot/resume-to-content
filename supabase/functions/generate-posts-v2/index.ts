@@ -478,14 +478,14 @@ function generateContextualCTA(tone: string, context: any): string {
   const topics = ['career transitions', 'skill development', 'industry changes', 'professional growth', 'work-life balance', 'team collaboration'];
   const engagements = ['Share your thoughts!', 'Drop your experiences below!', 'Would love to hear your perspective!', 'What do you think?', 'Curious about your take!', 'Let me know in the comments!'];
   
-  const randomQuestion = questions[uniqueId % questions.length];
-  const randomTopic = topics[(uniqueId + randomSalt) % topics.length];
-  const randomEngagement = engagements[(uniqueId + seed) % engagements.length];
+  const randomQuestion = questions[uniqueId % questions.length] || 'What has been your experience';
+  const randomTopic = topics[(uniqueId + randomSalt) % topics.length] || 'professional growth';
+  const randomEngagement = engagements[(uniqueId + seed) % engagements.length] || 'Share your thoughts!';
   
   if (tone === 'professional') {
     const professionalCTAs = [
       `${randomQuestion} with ${focus} in your professional journey? I'd welcome insights from fellow professionals.`,
-      `Fellow professionals - ${(randomQuestion || 'What has been your experience').toLowerCase()} ${randomTopic} and ${focus}? ${randomEngagement}`,
+      `Fellow professionals - ${randomQuestion.toLowerCase()} ${randomTopic} and ${focus}? ${randomEngagement}`,
       `${randomQuestion} balancing technical excellence with ${focus}? Looking forward to your perspectives.`,
       `What strategies have proven most effective for achieving ${focus} in your field? ${randomEngagement}`,
       `How do you approach ${randomTopic} while maintaining focus on ${focus}? Interested in your approaches.`
@@ -496,7 +496,7 @@ function generateContextualCTA(tone: string, context: any): string {
   if (tone === 'casual') {
     const casualCTAs = [
       `${randomQuestion} with ${randomTopic}? ${randomEngagement}`,
-      `Fellow professionals - ${(randomQuestion || 'What has been your experience').toLowerCase()} ${focus} in your day-to-day work?`,
+      `Fellow professionals - ${randomQuestion.toLowerCase()} ${focus} in your day-to-day work?`,
       `Anyone else dealing with ${randomTopic}? What's working for you?`,
       `${randomQuestion} navigating ${focus}? Drop your stories below!`,
       `What's your take on ${randomTopic} and ${focus}? ${randomEngagement}`
