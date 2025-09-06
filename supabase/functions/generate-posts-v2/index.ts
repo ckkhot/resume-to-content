@@ -418,46 +418,6 @@ The professionals who get promoted aren't always the most technically skilled. T
     
     return casualBodies[uniqueId % casualBodies.length];
   }
-    const casualBodies = [
-      \`Working on \${keyWord} taught me \${skillsList}, but the real world is teaching me everything about \${randomLearning}.
-
-What my \${degree} didn't prepare me for:
-
-• How much time you spend dealing with \${randomChallenge}
-• That \${randomLearning} often trumps technical expertise
-• How important understanding \${randomInsight} really is  
-• The politics behind every decision about \${randomOutcome}
-• That soft skills determine who actually drives \${focus}
-
-Turns out the technical stuff was just the entry fee. The human element is where \${focus} really happens.\`,
-
-      \`Six months into \${keyWord} and I finally understand why everyone talks about \${randomLearning}.
-
-Reality check on \${focus}:
-
-• It's 20% \${skillsList} and 80% everything else
-• Understanding \${randomInsight} matters more than perfect execution
-• \${randomChallenge} will test you more than any technical problem
-• Building \${randomOutcome} requires more \${randomLearning} than coding
-• The best opportunities go to people who can navigate both
-
-The sweet spot is being technical enough to be credible but focused enough on \${randomOutcome} to be valuable.\`,
-
-      \`Real talk about \${keyWord}: everyone focuses on \${skillsList}, but that's not where careers are made.
-
-What actually drives \${focus}:
-
-• Your ability to handle \${randomChallenge} under pressure
-• Understanding \${randomInsight} before your competitors do
-• Building relationships that create \${randomOutcome}
-• Developing \${randomLearning} that make teams better
-• Knowing when technical perfection matters vs when \${focus} matters more
-
-The professionals who get promoted aren't always the most technically skilled. They're the ones who consistently deliver \${randomOutcome}.\`
-    ];
-    
-    return casualBodies[uniqueId % casualBodies.length];
-  }
   
   // Bold tone
   const boldBodies = [
