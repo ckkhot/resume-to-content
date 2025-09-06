@@ -64,45 +64,78 @@ serve(async (req) => {
     }
     console.log('✅ User authenticated:', user.id);
 
-    // Create test posts without OpenAI for now to isolate the issue
-    const testPosts = [
-      {
-        tone: 'professional',
-        hook: 'Exciting career milestone ahead! 🎯',
-        body: `Just received an incredible internship offer in analytics and AI at a Y Combinator company. This opportunity represents everything I've been working toward - combining cutting-edge technology with real-world impact.
+    // Create system prompt based on resume data and user prompt
+    let systemPrompt = `You are a LinkedIn content expert. Generate 3 high-quality LinkedIn posts based on the user's prompt.`;
+    
+    if (resumeData && resumeData.name) {
+      systemPrompt += `\n\nUser's background from resume:
+- Name: ${resumeData.name}
+- Skills: ${resumeData.skills?.join(', ') || 'Not specified'}
+- Experience: ${resumeData.experience?.map(exp => `${exp.role} at ${exp.company}`).join(', ') || 'Not specified'}
+- Education: ${resumeData.education?.map(edu => `${edu.degree} from ${edu.institution}`).join(', ') || 'Not specified'}`;
+    }
+    
+    systemPrompt += `\n\nGenerate posts in exactly these 3 tones:
+1. Professional - Corporate-friendly, authoritative tone
+2. Casual - Relatable, conversational tone  
+3. Bold - Attention-grabbing, provocative tone
 
-The journey to get here involved countless hours of skill development, networking, and perseverance. Every rejection taught me something new, and every small win built momentum toward this moment.
+Each post should have:
+- hook: Compelling opening (1-2 sentences)
+- body: Main content with personal insights (2-3 short paragraphs)
+- cta: Call-to-action for engagement
 
-I'm grateful for the mentors, peers, and experiences that shaped this path. Sometimes the best opportunities come when preparation meets possibility.`,
-        cta: "What's been your biggest career breakthrough this year? Share your story below! 👇"
+Return ONLY a JSON array with objects containing: { "tone": "professional/casual/bold", "hook": "...", "body": "...", "cta": "..." }`;
+
+    console.log('✅ Making OpenAI API call...');
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json',
       },
-      {
-        tone: 'casual',
-        hook: 'Plot twist: Dreams do come true! ✨',
-        body: `Okay, I literally can't contain my excitement right now. Just got the call - I landed an internship at a YC company working on analytics and AI! 🤯
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.8,
+        max_tokens: 2000,
+      }),
+    });
 
-Still feels surreal. All those late nights grinding on projects, the nerve-wracking interviews, the moments of self-doubt... it all led to this. Sometimes the universe really does reward hard work and persistence.
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`);
+    }
 
-This is just the beginning, but wow - what a beginning it is. Ready to learn, contribute, and maybe even change the world a little bit along the way.`,
-        cta: "Drop a 🔥 if you believe persistence pays off! Let's celebrate wins together 🎉"
-      },
-      {
-        tone: 'bold',
-        hook: 'Breaking: The future just got brighter! 🚀',
-        body: `NEWS FLASH: Your girl just secured an internship at a Y Combinator analytics and AI company! This isn't just a job - it's a launching pad into the future of technology.
-
-Here's what this means: I'll be working alongside brilliant minds, solving problems that matter, and contributing to innovations that could shape entire industries. The learning curve will be steep, but that's exactly where I thrive.
-
-To everyone who said "analytics and AI are too competitive" or "you need more experience" - watch this space. Sometimes you don't wait for permission to level up. You create your own opportunities.`,
-        cta: "Who else is ready to disrupt their industry? Tag someone who needs to see this! 💪"
-      }
-    ];
-
-    console.log('✅ Posts created successfully');
+    const openaiResult = await response.json();
+    console.log('✅ OpenAI response received');
+    
+    let posts;
+    try {
+      posts = JSON.parse(openaiResult.choices[0].message.content);
+      console.log('✅ Posts parsed successfully');
+    } catch (e) {
+      console.error('❌ Failed to parse OpenAI response as JSON:', e);
+      // Fallback if JSON parsing fails
+      const content = openaiResult.choices[0].message.content;
+      posts = [
+        {
+          tone: 'professional',
+          hook: 'Generated content available',
+          body: content.substring(0, 1000),
+          cta: "What are your thoughts on this topic?"
+        }
+      ];
+    }
+    console.log('✅ Posts generated successfully');
 
     return new Response(
       JSON.stringify({ 
-        posts: testPosts,
+        posts: posts,
         message: resumeData ? 'Posts personalized with resume data' : 'Posts generated successfully'
       }),
       { 
