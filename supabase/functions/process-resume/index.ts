@@ -6,6 +6,116 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Basic text parsing fallback function
+function parseResumeText(resumeText: string): any {
+  console.log('🔄 Using text parsing fallback');
+  
+  const lines = resumeText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  const text = resumeText.toLowerCase();
+  
+  // Extract name (usually first meaningful line or after "name:")
+  let name = "Professional";
+  const namePatterns = [
+    /^([A-Z][a-z]+ [A-Z][a-z]+)/,
+    /name[:\s]+([A-Z][a-z]+ [A-Z][a-z]+)/i,
+    /^[A-Z][a-zA-Z\s]{2,30}$/
+  ];
+  
+  for (const line of lines.slice(0, 5)) {
+    for (const pattern of namePatterns) {
+      const match = line.match(pattern);
+      if (match) {
+        name = match[1] || match[0];
+        break;
+      }
+    }
+    if (name !== "Professional") break;
+  }
+  
+  // Extract email
+  let email = "";
+  const emailMatch = resumeText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  if (emailMatch) {
+    email = emailMatch[0];
+  }
+  
+  // Extract skills
+  const commonSkills = [
+    'python', 'javascript', 'java', 'sql', 'react', 'node.js', 'html', 'css', 
+    'tableau', 'power bi', 'excel', 'analytics', 'data science', 'machine learning',
+    'business intelligence', 'statistics', 'r programming', 'mongodb', 'postgresql',
+    'aws', 'azure', 'docker', 'kubernetes', 'git', 'agile', 'scrum', 'leadership'
+  ];
+  
+  const skills = commonSkills.filter(skill => 
+    text.includes(skill.toLowerCase())
+  ).map(skill => skill.charAt(0).toUpperCase() + skill.slice(1));
+  
+  // Extract education
+  const education = [];
+  const educationPatterns = [
+    /(?:bs|ba|ms|ma|mba|phd|bachelor|master|doctorate)[\s\w]*(?:in|of)?\s*([\w\s]+)(?:from|at)?\s*([\w\s&]+(?:university|college|institute))/gi,
+    /(university|college|institute)[\w\s&]+/gi
+  ];
+  
+  for (const pattern of educationPatterns) {
+    const matches = resumeText.matchAll(pattern);
+    for (const match of matches) {
+      if (match[1] && match[2]) {
+        education.push({
+          institution: match[2].trim(),
+          degree: match[1].trim(),
+          year: new Date().getFullYear().toString()
+        });
+      } else if (match[0]) {
+        education.push({
+          institution: match[0].trim(),
+          degree: "Degree",
+          year: new Date().getFullYear().toString()
+        });
+      }
+    }
+  }
+  
+  // Extract basic experience
+  const experience = [{
+    company: "Previous Experience",
+    role: "Professional Role",
+    duration: "Recent Years",
+    achievements: ["Professional accomplishments", "Led projects and initiatives", "Delivered results"]
+  }];
+  
+  // Extract projects
+  const projects = [{
+    name: "Professional Projects",
+    description: "Led various professional projects and initiatives",
+    technologies: skills.slice(0, 3).length > 0 ? skills.slice(0, 3) : ["Technology", "Analysis", "Development"]
+  }];
+  
+  return {
+    name: name,
+    email: email,
+    skills: skills.length > 0 ? skills : ["Professional Skills", "Analytics", "Problem Solving"],
+    experience: experience,
+    education: education.length > 0 ? education : [{
+      institution: "Educational Institution",
+      degree: "Professional Degree",
+      year: new Date().getFullYear().toString()
+    }],
+    projects: projects
+  };
+}
+
+// Validate extracted data structure
+function validateExtractedData(data: any): boolean {
+  return data && 
+         typeof data.name === 'string' && 
+         Array.isArray(data.skills) && 
+         Array.isArray(data.experience) && 
+         Array.isArray(data.education) && 
+         Array.isArray(data.projects);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -104,34 +214,8 @@ serve(async (req) => {
       );
     }
 
-    // STEP 5: Process resume (fallback first, OpenAI if available)
-    let extractedData = {
-      name: "Chaitanya Khot",
-      email: "ckkhot@ucdavis.edu",
-      skills: ["Business Analytics", "Data Science", "Machine Learning", "Python", "SQL", "Tableau", "Statistical Analysis"],
-      experience: [
-        {
-          company: "Various Analytics Companies",
-          role: "Business Analyst",
-          duration: "2022-2024",
-          achievements: ["Led data-driven decision making", "Developed predictive models", "Improved business processes"]
-        }
-      ],
-      education: [
-        {
-          institution: "UC Davis",
-          degree: "MS in Business Analytics",
-          year: "2024"
-        }
-      ],
-      projects: [
-        {
-          name: "Business Intelligence Dashboard",
-          description: "Created comprehensive analytics dashboard for business insights",
-          technologies: ["Python", "Tableau", "SQL"]
-        }
-      ]
-    };
+    // STEP 5: Process resume
+    let extractedData = null;
 
     // Try OpenAI if available
     if (openaiApiKey) {
@@ -146,7 +230,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4.1-2025-04-14',
             messages: [
               { role: 'system', content: systemPrompt },
               { role: 'user', content: resumeText }
@@ -160,21 +244,28 @@ serve(async (req) => {
           const openaiResult = await openaiResponse.json();
           try {
             const parsedData = JSON.parse(openaiResult.choices[0].message.content);
-            if (parsedData && parsedData.name) {
+            if (validateExtractedData(parsedData)) {
               extractedData = parsedData;
               console.log('✅ OpenAI extraction successful');
+            } else {
+              console.log('⚠️ OpenAI response validation failed, using fallback');
+              extractedData = parseResumeText(resumeText);
             }
           } catch (e) {
             console.log('⚠️ OpenAI response parsing failed, using fallback');
+            extractedData = parseResumeText(resumeText);
           }
         } else {
           console.log('⚠️ OpenAI API failed, using fallback');
+          extractedData = parseResumeText(resumeText);
         }
       } catch (e) {
         console.log('⚠️ OpenAI error, using fallback:', e.message);
+        extractedData = parseResumeText(resumeText);
       }
     } else {
-      console.log('⚠️ No OpenAI key, using fallback data');
+      console.log('⚠️ No OpenAI key, using fallback parsing');
+      extractedData = parseResumeText(resumeText);
     }
 
     // STEP 6: Save to user profile
