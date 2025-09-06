@@ -504,91 +504,17 @@ function generateContextualCTA(tone: string, context: any): string {
     return casualCTAs[uniqueId % casualCTAs.length];
   }
   
-  // Bold tone
-  const boldCTAs = [
-    `${randomQuestion} challenging the status quo in ${randomTopic}? Time for some real talk.`,
-    `What industry assumption about ${focus} needs to be called out? ${randomEngagement}`,
-    `${randomQuestion} driving real change in ${randomTopic}? Let's discuss.`,
-    `What controversial opinion do you have about ${focus}? Ready for the debate!`,
-    `Which ${randomTopic} trend is completely overrated? ${randomEngagement}`
-  ];
-  return boldCTAs[uniqueId % boldCTAs.length];
-}
-    professional: {
-      graduation: [
-        'Fellow recent graduates - what has been your biggest learning curve transitioning from academic theory to professional practice?',
-        'Recent grads - what industry reality surprised you most? Share your transition insights.',
-        'New graduates - how are you bridging the gap between classroom learning and real-world application?'
-      ],
-      jobsearch_ai: [
-        'AI and analytics professionals - what business problem are you most excited to solve? Share your perspectives.',
-        'Fellow AI professionals - what skills gap surprised you most in the current job market?',
-        'AI and data professionals - what\'s the most impactful project you\'ve worked on recently?'
-      ],
-      analytics: [
-        'Analytics professionals - what has been your experience bridging technical expertise with business strategy?',
-        'Data professionals - what soft skill has had the biggest impact on your career progression?',
-        'Fellow analysts - what business metric do you think is most overrated? Most underrated?'
-      ],
-      general: [
-        'What has been your experience balancing technical depth with broader business understanding?',
-        'Fellow professionals - what industry trend are you most excited about in the coming year?',
-        'What unexpected skill has been most valuable in your career journey so far?'
-      ]
-    },
-    casual: {
-      graduation: [
-        'Other recent grads - what surprised you most about the transition to professional life? Would love to hear your stories.',
-        'Fellow new grads - what\'s the weirdest thing about corporate life that no one warned you about?',
-        'Recent graduates - what advice would you give your college self? Drop it in the comments!'
-      ],
-      jobsearch_ai: [
-        'Anyone else navigating the AI job market? What opportunities are you most excited about?',
-        'Fellow job seekers in tech - what interview question caught you most off guard?',
-        'AI job hunters - what skill are you working on that you wish you\'d started earlier?'
-      ],
-      analytics: [
-        'Fellow data folks - what soft skill has surprised you the most in terms of career impact?',
-        'Other analytics professionals - what\'s the most ridiculous data request you\'ve ever received?',
-        'Data people - what tool or technique completely changed how you work?'
-      ],
-      general: [
-        'What unexpected skills have been most valuable in your career journey? Share your experiences!',
-        'Fellow professionals - what industry myth did you believe for way too long?',
-        'What\'s the best career advice you\'ve ever received? (And the worst?)'
-      ]
-    },
-    bold: {
-      graduation: [
-        'Fellow grads - what industry reality check hit you hardest? Let\'s discuss what needs to change in education.',
-        'Recent graduates - what sacred cow in higher education needs to be challenged? Speak up.',
-        'New professionals - what skill should universities be teaching but aren\'t? Time for honest feedback.'
-      ],
-      jobsearch_ai: [
-        'Ready to have an honest conversation about AI hype vs. reality? What problems actually need solving?',
-        'AI professionals - what buzzword needs to die? What concept needs more attention?',
-        'Fellow tech professionals - what AI application is most overrated? Most underrated?'
-      ],
-      analytics: [
-        'Time for some honest reflection - what analytics project seemed impressive but delivered zero business value?',
-        'Analytics professionals - what metric is everyone tracking that actually doesn\'t matter?',
-        'Data folks - what\'s the most expensive analytics mistake you\'ve seen? (Names redacted, lessons shared.)'
-      ],
-      general: [
-        'What sacred cow in your industry needs to be challenged? Drop your controversial takes below.',
-        'Fellow professionals - what widely accepted practice in your field is actually counterproductive?',
-        'What industry emperor has no clothes? Time for some honest conversation.'
-      ]
-    }
-  };
+  if (tone === 'bold') {
+    const boldCTAs = [
+      `${randomQuestion} challenging the status quo in ${randomTopic}? Time for some real talk.`,
+      `What industry assumption about ${focus} needs to be called out? ${randomEngagement}`,
+      `${randomQuestion} driving real change in ${randomTopic}? Let's discuss.`,
+      `What controversial opinion do you have about ${focus}? Ready for the debate!`,
+      `Which ${randomTopic} trend is completely overrated? ${randomEngagement}`
+    ];
+    return boldCTAs[uniqueId % boldCTAs.length];
+  }
   
-  const toneVariations = ctaVariations[tone as keyof typeof ctaVariations];
-  let selectedCTAs: string[] = [];
-  
-  if (isGraduation) selectedCTAs = toneVariations.graduation;
-  else if (isJobSearch && isAI) selectedCTAs = toneVariations.jobsearch_ai;
-  else if (isAnalytics) selectedCTAs = toneVariations.analytics;
-  else selectedCTAs = toneVariations.general;
-  
-  return selectedCTAs[variation % selectedCTAs.length];
+  // Default fallback
+  return `What are your thoughts on ${focus}? ${randomEngagement}`;
 }
