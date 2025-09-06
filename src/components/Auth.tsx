@@ -11,6 +11,8 @@ export const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
+  const [showReset, setShowReset] = useState(false);
   const { toast } = useToast();
 
   // Check if Supabase is properly configured
@@ -91,6 +93,31 @@ export const Auth = () => {
     setLoading(false);
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/`,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Check your email for password reset instructions!",
+      });
+      setShowReset(false);
+      setResetEmail('');
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background tech-grid p-4">
       <Card className="w-full max-w-md shadow-tech-lg border-tech-border bg-surface">
@@ -148,6 +175,15 @@ export const Auth = () => {
                 >
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowReset(true)}
+                    className="text-sm text-primary hover:text-tech-secondary transition-colors"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
               </form>
             </TabsContent>
             
@@ -196,6 +232,52 @@ export const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Password Reset Modal */}
+      {showReset && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-md shadow-tech-lg border-tech-border bg-surface">
+            <CardHeader>
+              <CardTitle className="text-lg">Reset Password</CardTitle>
+              <CardDescription>
+                Enter your email to receive password reset instructions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                  className="input-tech h-11 px-4 border-tech-border focus:border-primary transition-all duration-200"
+                />
+                <div className="flex gap-3">
+                  <Button 
+                    type="submit" 
+                    className="flex-1 h-11 bg-primary hover:bg-tech-secondary text-primary-foreground transition-all duration-200" 
+                    disabled={loading}
+                  >
+                    {loading ? 'Sending...' : 'Send Reset Email'}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => {
+                      setShowReset(false);
+                      setResetEmail('');
+                    }}
+                    className="h-11 border-tech-border"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
