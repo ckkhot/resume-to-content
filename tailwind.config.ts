@@ -100,6 +100,11 @@ export default {
 				'fade-in': 'fadeIn 0.3s ease-out',
 				'slide-up': 'slideUp 0.3s ease-out',
 				'pulse-tech': 'pulseTech 2s infinite'
+			},
+			boxShadow: {
+				'tech': '0 2px 20px -5px hsl(0 0% 0% / 0.1)',
+				'tech-lg': '0 10px 40px -15px hsl(0 0% 0% / 0.15)',
+				'glow': '0 0 30px hsl(0 0% 0% / 0.05)'
 			}
 		},
 		fontFamily: {
