@@ -64,9 +64,10 @@ export const SystemTest = () => {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>System Diagnostics</CardTitle>
+        <p className="text-sm text-muted-foreground">Use this to debug post generation issues</p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-4">
@@ -75,15 +76,24 @@ export const SystemTest = () => {
             disabled={isRunning}
             variant="outline"
           >
-            {isRunning ? 'Running...' : 'Test System'}
+            {isRunning ? 'Testing...' : 'Test OpenAI Connection'}
           </Button>
           <Button 
             onClick={testPostGeneration}
             disabled={isRunning}
             variant="outline"
           >
-            Test Post Generation
+            {isRunning ? 'Testing...' : 'Test Post Generation'}
           </Button>
+        </div>
+
+        <div className="text-sm space-y-2">
+          <p><strong>Expected behavior:</strong></p>
+          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+            <li>OpenAI test should return <code className="bg-muted px-1 rounded">success: true</code></li>
+            <li>Post generation should show <code className="bg-muted px-1 rounded">"source": "openai"</code></li>
+            <li>If OpenAI fails, it will use randomized fallback content</li>
+          </ul>
         </div>
 
         {testResults && (

@@ -169,10 +169,13 @@ Generate 3 completely different posts about this topic. Each should offer a uniq
 
         if (openaiResponse.ok) {
           const openaiResult = await openaiResponse.json();
-          console.log('🔍 OpenAI response received');
+          console.log('🔍 OpenAI response received, status:', openaiResponse.status);
           
           try {
-            const generatedPosts = JSON.parse(openaiResult.choices[0].message.content);
+            const responseContent = openaiResult.choices[0].message.content;
+            console.log('🔍 OpenAI raw response content:', responseContent.substring(0, 200) + '...');
+            
+            const generatedPosts = JSON.parse(responseContent);
             if (Array.isArray(generatedPosts) && generatedPosts.length === 3) {
               posts = generatedPosts.map(post => ({
                 ...post,
@@ -183,64 +186,72 @@ Generate 3 completely different posts about this topic. Each should offer a uniq
               console.log('✅ OpenAI posts generated successfully');
               usedOpenAI = true; // Mark that we used OpenAI
             } else {
-              console.log('⚠️ Invalid OpenAI response structure, using fallback');
+              console.log('⚠️ Invalid OpenAI response structure:', typeof generatedPosts, 'length:', generatedPosts?.length);
             }
           } catch (e) {
             console.log('⚠️ OpenAI response parsing failed:', e.message);
+            console.log('⚠️ Raw response:', openaiResult.choices?.[0]?.message?.content);
           }
         } else {
           const errorText = await openaiResponse.text();
-          console.log('⚠️ OpenAI API failed:', openaiResponse.status, errorText);
+          console.log('⚠️ OpenAI API failed:', openaiResponse.status, openaiResponse.statusText);
+          console.log('⚠️ Error details:', errorText);
         }
       } catch (e) {
         console.log('⚠️ OpenAI request error:', e.message);
       }
     }
 
-    // Fallback posts with better randomization (only if OpenAI failed or unavailable)
+    // Enhanced fallback posts with user prompt integration (only if OpenAI failed)
     if (posts.length === 0) {
-      console.log('📝 Using fallback posts with randomized content');
+      console.log('📝 Using enhanced fallback posts with prompt integration');
       
-      // Create multiple variations and pick randomly
+      // Extract key topics from user prompt for more relevant content
+      const promptLower = prompt.toLowerCase();
+      const isGraduation = promptLower.includes('graduation') || promptLower.includes('graduate') || promptLower.includes('degree');
+      const isAnalytics = promptLower.includes('analytics') || promptLower.includes('data');
+      const isUCDavis = promptLower.includes('uc davis') || promptLower.includes('davis');
+      
       const randomSeed = Math.floor(Math.random() * 1000);
       const variations = [
         {
           professional: {
-            hook: `The biggest mistake in business analytics is thinking data speaks for itself. [${randomSeed}]`,
-            body: `Throughout my career in analytics, I have observed that raw data without context is just noise. The real value comes from translating complex datasets into actionable business insights.\n\nSuccessful analytics professionals understand three critical principles:\n\n• Data storytelling drives decision-making\n• Context transforms numbers into strategy\n• Communication bridges the gap between analysis and action\n\nThe most impactful analytics work happens when technical expertise meets business acumen.`,
-            cta: 'What has been your experience turning data into actionable insights? Share your approach in the comments.'
+            hook: isGraduation 
+              ? `Completing my ${isAnalytics ? 'MS in Business Analytics' : 'graduate program'} has taught me that success isn't about the degree itself. [${randomSeed}]`
+              : `The biggest mistake in business analytics is thinking data speaks for itself. [${randomSeed}]`,
+            body: isGraduation
+              ? `${isUCDavis ? 'My time at UC Davis' : 'Graduate school'} has reinforced that ${isAnalytics ? 'analytics excellence' : 'professional success'} comes from understanding both technical skills and business context.\n\nKey insights from my ${isAnalytics ? 'analytics' : 'academic'} journey:\n\n• Technical expertise must be paired with business acumen\n• Communication skills are as important as analytical capabilities\n• Real-world applications differ significantly from classroom theory\n• Cross-functional collaboration drives meaningful impact\n\nThe most valuable professionals bridge the gap between complex analysis and actionable business strategy.`
+              : `Throughout my career in analytics, I have observed that raw data without context is just noise. The real value comes from translating complex datasets into actionable business insights.\n\nSuccessful analytics professionals understand three critical principles:\n\n• Data storytelling drives decision-making\n• Context transforms numbers into strategy\n• Communication bridges the gap between analysis and action\n\nThe most impactful analytics work happens when technical expertise meets business acumen.`,
+            cta: isGraduation
+              ? `Fellow ${isAnalytics ? 'analytics' : ''} graduates - what has been your biggest learning curve transitioning from academic theory to professional practice?`
+              : 'What has been your experience turning data into actionable insights? Share your approach in the comments.'
           },
           casual: {
-            hook: `Here is what nobody tells you about breaking into business analytics. [${randomSeed}]`,
-            body: `Starting my analytics journey, I thought it was all about mastering Python and SQL. Boy, was I wrong.\n\nThe real skills that matter:\n\n• Asking the right business questions\n• Translating technical findings for non-technical stakeholders\n• Understanding the story behind the numbers\n• Building relationships across departments\n\nTechnical skills get you in the door, but business sense keeps you valuable.`,
-            cta: 'Current and aspiring analysts - what surprised you most about this field? Would love to hear your experiences.'
+            hook: isGraduation
+              ? `Just wrapped up my ${isAnalytics ? 'MS in Business Analytics' : 'graduate program'} and honestly, the real learning is just beginning. [${randomSeed}]`
+              : `Here is what nobody tells you about breaking into business analytics. [${randomSeed}]`,
+            body: isGraduation
+              ? `${isUCDavis ? 'UC Davis' : 'Grad school'} taught me the fundamentals, but the working world is teaching me everything else.\n\nWhat ${isAnalytics ? 'analytics' : 'graduate'} school didn't prepare me for:\n\n• How messy real-world data actually is\n• The politics of getting stakeholders to trust your analysis\n• That 80% of the job is explaining things to non-technical people\n• How much business context matters for good analysis\n\n${isAnalytics ? 'The algorithms and models were the easy part' : 'The technical skills were just the foundation'}. The human element is where the real challenge lies.`
+              : `Starting my analytics journey, I thought it was all about mastering Python and SQL. Boy, was I wrong.\n\nThe real skills that matter:\n\n• Asking the right business questions\n• Translating technical findings for non-technical stakeholders\n• Understanding the story behind the numbers\n• Building relationships across departments\n\nTechnical skills get you in the door, but business sense keeps you valuable.`,
+            cta: isGraduation
+              ? `Other recent ${isAnalytics ? 'analytics' : ''} grads - what has surprised you most about the transition to professional life?`
+              : 'Current and aspiring analysts - what surprised you most about this field? Would love to hear your experiences.'
           },
           bold: {
-            hook: `Most companies are drowning in data but starving for insights. [${randomSeed}]`,
-            body: `After working with dozens of organizations, I have seen the same pattern repeatedly. Companies invest millions in data infrastructure but fail at the most crucial step: turning information into action.\n\nThe uncomfortable truth:\n\n• 80% of analytics projects never influence a single business decision\n• Executives get overwhelmed by dashboards that answer the wrong questions\n• Teams mistake correlation for causation and call it strategy\n\nWe need fewer data scientists building models and more analytics professionals solving real business problems.`,
-            cta: 'Ready to challenge how your organization uses data? What is one analytics myth your company needs to stop believing?'
-          }
-        },
-        {
-          professional: {
-            hook: `Why most analytics projects fail before they even start. [${randomSeed}]`,
-            body: `In my experience working across various industries, I have discovered that successful analytics initiatives share one common trait: they begin with the right questions, not the right data.\n\nKey factors that separate successful projects from failures:\n\n• Clear business objectives defined upfront\n• Stakeholder alignment on success metrics\n• Realistic timelines that account for data quality issues\n• Cross-functional collaboration from day one\n\nThe most valuable analytics professionals are those who can navigate organizational dynamics while delivering technical excellence.`,
-            cta: 'Analytics professionals - what is the most important lesson you have learned about project success? Share your insights below.'
-          },
-          casual: {
-            hook: `Plot twist: The hardest part of analytics is not the math. [${randomSeed}]`,
-            body: `When I started in analytics, I thought success meant building the most sophisticated models. Three years later, I have learned the real challenge is much more human.\n\nWhat actually matters most:\n\n• Getting people to trust your recommendations\n• Explaining complex concepts in simple terms\n• Building consensus across different teams\n• Managing expectations when data is messy\n\nThe technical skills are table stakes. The soft skills are what make you indispensable.`,
-            cta: 'Fellow data folks - what soft skill surprised you the most in this field? Let me know your thoughts.'
-          },
-          bold: {
-            hook: `Hot take: Your fancy dashboard is probably useless. [${randomSeed}]`,
-            body: `After auditing analytics implementations across dozens of companies, I have reached a controversial conclusion: most organizations are building the wrong things.\n\nThe harsh reality:\n\n• Beautiful visualizations that nobody uses for decisions\n• Real-time dashboards for metrics that change monthly\n• Complex models that solve problems nobody has\n• Analytics teams isolated from business strategy\n\nWe need to stop building what looks impressive and start building what drives action.`,
-            cta: 'Time for some honest reflection - what analytics project seemed great but delivered zero business value? Share your stories.'
+            hook: isGraduation
+              ? `Hot take: Most ${isAnalytics ? 'analytics' : ''} graduate programs are preparing students for jobs that don't exist. [${randomSeed}]`
+              : `Most companies are drowning in data but starving for insights. [${randomSeed}]`,
+            body: isGraduation
+              ? `Just finished my ${isAnalytics ? 'MS in Business Analytics' : 'graduate degree'} and I am convinced that academia is still catching up to industry reality.\n\nWhat ${isAnalytics ? 'analytics' : ''} programs get wrong:\n\n• Too much focus on perfect, clean datasets\n• Not enough emphasis on stakeholder management\n• Overemphasis on complex models vs. simple, actionable insights\n• Missing the soft skills that actually drive career success\n\n${isUCDavis ? 'UC Davis gave me a solid foundation' : 'My program taught me the basics'}, but the real education starts now. We need ${isAnalytics ? 'analytics' : ''} programs that teach students how to navigate organizational politics, not just algorithms.`
+              : `After working with dozens of organizations, I have seen the same pattern repeatedly. Companies invest millions in data infrastructure but fail at the most crucial step: turning information into action.\n\nThe uncomfortable truth:\n\n• 80% of analytics projects never influence a single business decision\n• Executives get overwhelmed by dashboards that answer the wrong questions\n• Teams mistake correlation for causation and call it strategy\n\nWe need fewer data scientists building models and more analytics professionals solving real business problems.`,
+            cta: isGraduation
+              ? `Fellow ${isAnalytics ? 'analytics' : ''} grads - what industry reality check hit you hardest? Let's discuss what needs to change in education.`
+              : 'Ready to challenge how your organization uses data? What is one analytics myth your company needs to stop believing?'
           }
         }
       ];
 
-      const chosenVariation = variations[randomSeed % variations.length];
+      const chosenVariation = variations[0]; // Use the context-aware variation
       posts = [
         { tone: 'professional', ...chosenVariation.professional },
         { tone: 'casual', ...chosenVariation.casual },
