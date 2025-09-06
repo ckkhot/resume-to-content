@@ -9,6 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { Auth } from "./Auth";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { SystemTest } from "./SystemTest";
 
 interface GeneratedPost {
   hook: string;
@@ -210,6 +211,11 @@ export const LinkedInPostGenerator = () => {
             <PostOutput posts={generatedPosts} />
           </div>
         )}
+
+        {/* System Test Component - Only for debugging */}
+        <div className="max-w-6xl mx-auto mt-12">
+          <SystemTest />
+        </div>
       </div>
     </div>
   );
