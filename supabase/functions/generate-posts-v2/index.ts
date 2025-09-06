@@ -253,11 +253,12 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
 }
 
 function generateContextualHook(tone: string, context: any): string {
-  const { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, isWork, prompt, seed, variation, focus, randomSalt } = context;
-  
-  // Dynamic content elements that change each time
-  const timestamp = Date.now();
-  const uniqueId = (timestamp + randomSalt + seed) % 1000;
+  try {
+    const { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, isWork, prompt, seed, variation, focus, randomSalt } = context;
+    
+    // Dynamic content elements that change each time
+    const timestamp = Date.now();
+    const uniqueId = (timestamp + (randomSalt || 0) + (seed || 0)) % 1000;
   
   // Random dynamic elements
   const timeframes = ['Three years', 'Six months', 'Two years', 'Five years', 'A decade', 'Six weeks', 'Eight months'];
@@ -307,12 +308,17 @@ function generateContextualHook(tone: string, context: any): string {
     `The ${randomPromptWord} industry is broken because it prioritizes complexity over ${focus}.`
   ];
   return bold_starters[uniqueId % bold_starters.length];
+  } catch (error) {
+    console.error('Error in generateContextualHook:', error);
+    return `Exciting developments in ${context.focus || 'professional growth'} are reshaping the industry.`;
+  }
 }
 
 function generateContextualBody(tone: string, context: any): string {
-  const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt, seed, variation, focus, randomSalt } = context;
-  
-  const skillsList = skills.length > 0 ? skills.slice(0, 4).join(', ') : 'technical and analytical skills';
+  try {
+    const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt, seed, variation, focus, randomSalt } = context;
+    
+    const skillsList = (skills && skills.length > 0) ? skills.slice(0, 4).join(', ') : 'technical and analytical skills';
   const degree = education.degree || 'graduate program';
   const institution = education.institution || 'university';
   
@@ -464,14 +470,19 @@ The future belongs to professionals who can bridge the gap between technical cap
   
   // Fallback return
   return `After working in ${(prompt || 'professional development').toLowerCase()} for the past few years, I've come to a controversial conclusion: we're solving the wrong problems.\n\nWhat the industry gets wrong:\n\n• Obsession with technical complexity over business simplicity\n• Building solutions that impress other technologists but confuse customers\n• Focusing on what's technically possible instead of what's actually needed\n• Treating ${skillsList} as the end goal rather than the means to solve real problems\n\nThe most successful professionals I know aren't the ones with the most impressive technical portfolios. They're the ones who can take complex capabilities and apply them to solve simple, valuable business problems.`;
+  } catch (error) {
+    console.error('Error in generateContextualBody:', error);
+    return `My journey in professional development has taught me valuable lessons about balancing technical expertise with real-world impact.\n\nKey insights:\n\n• Technical skills are just the foundation\n• Understanding business needs drives success\n• Communication often matters more than complexity\n• Real impact comes from solving meaningful problems\n\nThe most successful professionals combine technical depth with strategic thinking.`;
+  }
 }
 
 function generateContextualCTA(tone: string, context: any): string {
-  const { isGraduation, isJobSearch, isAI, isAnalytics, isWork, seed, variation, focus, randomSalt } = context;
-  
-  // Dynamic CTA generation
-  const timestamp = Date.now();
-  const uniqueId = (timestamp + randomSalt + seed) % 1000;
+  try {
+    const { isGraduation, isJobSearch, isAI, isAnalytics, isWork, seed, variation, focus, randomSalt } = context;
+    
+    // Dynamic CTA generation
+    const timestamp = Date.now();
+    const uniqueId = (timestamp + (randomSalt || 0) + (seed || 0)) % 1000;
   
   // Random dynamic elements for CTAs
   const questions = ['What has been your experience', 'How are you handling', 'What surprised you most about', 'What advice would you give', 'How do you balance', 'What challenges have you faced'];
@@ -485,7 +496,7 @@ function generateContextualCTA(tone: string, context: any): string {
   if (tone === 'professional') {
     const professionalCTAs = [
       `${randomQuestion} with ${focus} in your professional journey? I'd welcome insights from fellow professionals.`,
-      `Fellow professionals - ${randomQuestion.toLowerCase()} ${randomTopic} and ${focus}? ${randomEngagement}`,
+      `Fellow professionals - ${(randomQuestion || 'What has been your experience').toLowerCase()} ${randomTopic} and ${focus}? ${randomEngagement}`,
       `${randomQuestion} balancing technical excellence with ${focus}? Looking forward to your perspectives.`,
       `What strategies have proven most effective for achieving ${focus} in your field? ${randomEngagement}`,
       `How do you approach ${randomTopic} while maintaining focus on ${focus}? Interested in your approaches.`
@@ -496,7 +507,7 @@ function generateContextualCTA(tone: string, context: any): string {
   if (tone === 'casual') {
     const casualCTAs = [
       `${randomQuestion} with ${randomTopic}? ${randomEngagement}`,
-      `Fellow professionals - ${randomQuestion.toLowerCase()} ${focus} in your day-to-day work?`,
+      `Fellow professionals - ${(randomQuestion || 'What has been your experience').toLowerCase()} ${focus} in your day-to-day work?`,
       `Anyone else dealing with ${randomTopic}? What's working for you?`,
       `${randomQuestion} navigating ${focus}? Drop your stories below!`,
       `What's your take on ${randomTopic} and ${focus}? ${randomEngagement}`
@@ -516,5 +527,9 @@ function generateContextualCTA(tone: string, context: any): string {
   }
   
   // Default fallback
-  return `What are your thoughts on ${focus}? ${randomEngagement}`;
+  return `What are your thoughts on ${focus || 'professional growth'}? ${randomEngagement || 'Share your thoughts!'}`;
+  } catch (error) {
+    console.error('Error in generateContextualCTA:', error);
+    return `What are your thoughts on professional growth? Share your insights below!`;
+  }
 }
