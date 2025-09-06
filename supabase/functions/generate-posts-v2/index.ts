@@ -232,21 +232,34 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
   ];
   
   // Generate varied posts
-  const posts = contexts.map(ctx => ({
-    tone: ctx.tone,
-    hook: generateContextualHook(ctx.tone, { 
+  const posts = contexts.map(ctx => {
+    console.log(`🔄 Generating post for tone: ${ctx.tone}`);
+    
+    const hook = generateContextualHook(ctx.tone, { 
       name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, isWork, prompt, 
-      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus 
-    }),
-    body: generateContextualBody(ctx.tone, { 
+      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus, randomSalt: ctx.randomSalt
+    });
+    console.log(`Hook generated for ${ctx.tone}:`, hook ? 'SUCCESS' : 'FAILED');
+    
+    const body = generateContextualBody(ctx.tone, { 
       name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt,
-      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus
-    }),
-    cta: generateContextualCTA(ctx.tone, { 
+      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus, randomSalt: ctx.randomSalt
+    });
+    console.log(`Body generated for ${ctx.tone}:`, body ? 'SUCCESS' : 'FAILED');
+    
+    const cta = generateContextualCTA(ctx.tone, { 
       isGraduation, isJobSearch, isAI, isAnalytics, isWork,
-      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus
-    })
-  }));
+      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus, randomSalt: ctx.randomSalt
+    });
+    console.log(`CTA generated for ${ctx.tone}:`, cta ? 'SUCCESS' : 'FAILED');
+    
+    return {
+      tone: ctx.tone,
+      hook: hook || `Exciting developments in ${ctx.focus} are reshaping the industry.`,
+      body: body || `My journey in professional development has taught me valuable lessons about balancing technical expertise with real-world impact.\n\nKey insights:\n\n• Technical skills are just the foundation\n• Understanding business needs drives success\n• Communication often matters more than complexity\n• Real impact comes from solving meaningful problems\n\nThe most successful professionals combine technical depth with strategic thinking.`,
+      cta: cta || `What are your thoughts on professional growth? Share your insights below!`
+    };
+  });
   
   console.log(`✅ Generated 3 unique fallback posts with guaranteed different variations: ${uniqueVariations.join(', ')}`);
   return posts;
@@ -268,8 +281,8 @@ function generateContextualHook(tone: string, context: any): string {
   
   // Get random elements based on the unique ID
   const randomTimeframe = timeframes[uniqueId % timeframes.length];
-  const randomInsight = insights[(uniqueId + randomSalt) % insights.length];
-  const randomSurprise = surprises[(uniqueId + seed) % surprises.length];
+  const randomInsight = insights[(uniqueId + (randomSalt || 0)) % insights.length];
+  const randomSurprise = surprises[(uniqueId + (seed || 0)) % surprises.length];
   const randomControversial = controversials[uniqueId % controversials.length];
   
   // Extract random words from prompt for dynamic integration with null safety
@@ -324,7 +337,7 @@ function generateContextualBody(tone: string, context: any): string {
   
   // Dynamic content generators
   const timestamp = Date.now();
-  const uniqueId = (timestamp + randomSalt + seed) % 1000;
+  const uniqueId = (timestamp + (randomSalt || 0) + (seed || 0)) % 1000;
   
   // Random dynamic content pools
   const challenges = ['messy real-world data', 'stakeholder expectations', 'budget constraints', 'timeline pressures', 'team dynamics', 'changing requirements'];
@@ -333,8 +346,8 @@ function generateContextualBody(tone: string, context: any): string {
   const insights = ['industry changes', 'market dynamics', 'customer behavior', 'technology trends', 'business needs', 'competitive landscape'];
   
   const randomChallenge = challenges[uniqueId % challenges.length];
-  const randomOutcome = outcomes[(uniqueId + randomSalt) % outcomes.length];
-  const randomLearning = learnings[(uniqueId + seed) % learnings.length];
+  const randomOutcome = outcomes[(uniqueId + (randomSalt || 0)) % outcomes.length];
+  const randomLearning = learnings[(uniqueId + (seed || 0)) % learnings.length];
   const randomInsight = insights[uniqueId % insights.length];
   
   // Extract and use prompt context dynamically with null safety
