@@ -172,7 +172,7 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
   const skills = resumeData?.skills || [];
   const education = resumeData?.education?.[0] || {};
   const isUCDavis = education.institution?.includes('UC Davis') || education.institution?.includes('Davis');
-  const isAnalytics = skills.some(s => s.toLowerCase().includes('analytics')) || education.degree?.includes('Analytics');
+  const isAnalytics = skills.some(s => s && s.toLowerCase().includes('analytics')) || education.degree?.includes('Analytics');
   
   // Analyze prompt for key themes with null safety
   const promptLower = (prompt || '').toLowerCase();
@@ -280,7 +280,7 @@ function generateContextualHook(tone: string, context: any): string {
     const professional_starters = [
       `${randomTimeframe} in ${randomPromptWord} has fundamentally changed my approach to ${focus}.`,
       `My journey through ${isUCDavis ? 'UC Davis and ' : ''}${randomPromptWord} ${randomInsight} that success requires ${focus}.`,
-      `After ${randomTimeframe.toLowerCase()} of ${(prompt || 'professional development').toLowerCase()}, I've discovered what truly drives ${focus}.`,
+      `After ${(randomTimeframe || 'some time').toLowerCase()} of ${(prompt || 'professional development').toLowerCase()}, I've discovered what truly drives ${focus}.`,
       `The intersection of ${randomPromptWord} and ${focus} is creating opportunities I never expected.`,
       `Working in ${randomPromptWord} has ${randomInsight} that ${focus} isn't what most people think.`
     ];
@@ -290,7 +290,7 @@ function generateContextualHook(tone: string, context: any): string {
   if (tone === 'casual') {
     const casual_starters = [
       `${randomSurprise} ${randomTimeframe} of ${randomPromptWord} and I finally get why ${focus} matters.`,
-      `Just spent ${randomTimeframe.toLowerCase()} in ${(prompt || 'professional development').toLowerCase()} and here's what nobody tells you.`,
+      `Just spent ${(randomTimeframe || 'some time').toLowerCase()} in ${(prompt || 'professional development').toLowerCase()} and here's what nobody tells you.`,
       `${randomSurprise} The hardest part of ${randomPromptWord} isn't the technical stuff.`,
       `Six months ago I thought ${randomPromptWord} was about X. Turns out it's all about ${focus}.`,
       `${randomSurprise} ${randomPromptWord} ${randomInsight} me more about ${focus} than I expected.`
