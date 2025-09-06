@@ -6,6 +6,8 @@ import { Upload, Send, User, Brain, Zap } from "lucide-react";
 import { PostOutput } from "./PostOutput";
 import { ResumeUpload } from "./ResumeUpload";
 import { ThemeToggle } from "./ThemeToggle";
+import { Auth } from "./Auth";
+import { useAuth } from "@/hooks/useAuth";
 
 interface GeneratedPost {
   hook: string;
@@ -15,11 +17,24 @@ interface GeneratedPost {
 }
 
 export const LinkedInPostGenerator = () => {
+  const { user, loading, signOut } = useAuth();
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [messages, setMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Auth />;
+  }
 
   const handleGeneratePosts = async () => {
     if (!prompt.trim() || !resumeUploaded) return;
@@ -65,18 +80,22 @@ export const LinkedInPostGenerator = () => {
       {/* Header */}
       <header className="border-b border-tech-border bg-surface">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Brain className="h-6 w-6 text-tech-primary" />
-                <h1 className="text-xl font-bold text-tech-primary">0.1% GPT</h1>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-6 w-6 text-tech-primary" />
+                  <h1 className="text-xl font-bold text-tech-primary">0.1% GPT</h1>
+                </div>
+                <div className="text-xs text-muted-foreground bg-tech-accent px-2 py-1 rounded">
+                  LinkedIn Post Generator
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground bg-tech-accent px-2 py-1 rounded">
-                LinkedIn Post Generator
+              <div className="flex gap-4 items-center">
+                <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
+                <Button variant="outline" onClick={signOut}>Sign Out</Button>
+                <ThemeToggle />
               </div>
             </div>
-            <ThemeToggle />
-          </div>
         </div>
       </header>
 
