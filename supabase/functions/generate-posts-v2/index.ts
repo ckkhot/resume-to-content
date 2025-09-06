@@ -253,103 +253,213 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
 }
 
 function generateContextualHook(tone: string, context: any): string {
-  const { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, isWork, prompt, seed, variation, focus } = context;
+  const { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, isWork, prompt, seed, variation, focus, randomSalt } = context;
   
-  // Create multiple variations for each condition
-  const variations = {
-    professional: {
-      graduation_ucdavis: [
-        'Completing my MS in Business Analytics at UC Davis has fundamentally shifted my perspective on data-driven leadership.',
-        'My graduate experience at UC Davis taught me that analytics mastery requires more than technical skills.',
-        'UC Davis equipped me with analytical frameworks, but real-world application taught me everything else.'
-      ],
-      jobsearch_ai: [
-        'The intersection of AI and business strategy is creating unprecedented career opportunities.',
-        'After deep research into AI career paths, I\'ve identified the skills that truly matter.',
-        'Three months of AI job market analysis revealed surprising patterns about what employers actually want.'
-      ],
-      analytics: [
-        'Five years in analytics has taught me that storytelling trumps statistical sophistication.',
-        'The most successful analytics professionals I know share one unexpected trait.',
-        'Analytics taught me that the right question matters more than the perfect model.'
-      ],
-      general: [
-        `My experience with ${prompt.split(' ').slice(0,2).join(' ')} has challenged conventional wisdom in surprising ways.`,
-        `After extensive work in ${prompt.split(' ')[0]}, I've discovered what truly drives sustainable success.`,
-        `Three key insights from my ${prompt.split(' ')[0]} journey that every professional should consider.`
-      ]
-    },
-    casual: {
-      graduation_ucdavis: [
-        'Just wrapped up my MS at UC Davis and honestly, the real education starts now.',
-        'UC Davis gave me the technical foundation, but LinkedIn is teaching me how careers actually work.',
-        'Fresh out of grad school at UC Davis with some thoughts on what they don\'t teach you.'
-      ],
-      jobsearch_ai: [
-        'Here\'s what nobody tells you about breaking into AI and growth roles.',
-        'Six months of AI job hunting taught me more than any course could.',
-        'The AI job market is wild right now - here\'s what I\'ve learned from 50+ applications.'
-      ],
-      analytics: [
-        'Plot twist: The hardest part of analytics isn\'t the math or the code.',
-        'Three years in analytics and I finally understand why soft skills matter more.',
-        'Analytics bootcamps prepare you for everything except the actual job.'
-      ],
-      general: [
-        `Real talk about ${prompt.toLowerCase()} - it's not what most people think.`,
-        `Six months deep into ${prompt.split(' ')[0]} and here's what surprised me most.`,
-        `Nobody warned me that ${prompt.split(' ')[0]} would be 20% technical work and 80% everything else.`
-      ]
-    },
-    bold: {
-      graduation: [
-        'Hot take: Most graduate programs are preparing students for jobs that don\'t exist anymore.',
-        'Unpopular opinion: Graduate school teaches you to be an expert in fields that are rapidly becoming obsolete.',
-        'Controversial truth: The skills that got me through grad school are barely relevant in the real world.'
-      ],
-      jobsearch_ai: [
-        'Everyone\'s rushing into AI without understanding what actually drives business value.',
-        'The AI job market is a bubble built on buzzwords rather than genuine business needs.',
-        'Most AI roles are just data analyst positions with inflated titles and salaries.'
-      ],
-      analytics: [
-        'Most companies are drowning in data but still making gut-based decisions.',
-        'Analytics is broken: We\'re optimizing metrics that don\'t matter while ignoring what actually drives growth.',
-        'The analytics industry has convinced everyone they need more data when they really need better decisions.'
-      ],
-      general: [
-        `Controversial opinion: The ${prompt.split(' ')[0]} industry has it completely backwards.`,
-        `Hard truth: Most ${prompt.split(' ')[0]} advice is outdated by the time you hear it.`,
-        `Unpopular take: ${prompt.split(' ')[0]} success has more to do with timing than talent.`
-      ]
-    }
-  };
-
-  // Select variation based on seed
-  const toneVariations = variations[tone as keyof typeof variations];
-  let selectedHooks: string[] = [];
+  // Dynamic content elements that change each time
+  const timestamp = Date.now();
+  const uniqueId = (timestamp + randomSalt + seed) % 1000;
   
+  // Random dynamic elements
+  const timeframes = ['Three years', 'Six months', 'Two years', 'Five years', 'A decade', 'Six weeks', 'Eight months'];
+  const insights = ['taught me', 'showed me', 'revealed', 'made me realize', 'convinced me', 'proved to me', 'demonstrated'];
+  const surprises = ['Plot twist:', 'Here\'s the thing:', 'Real talk:', 'Turns out:', 'Honestly,', 'Fun fact:', 'Reality check:'];
+  const controversials = ['Hot take:', 'Unpopular opinion:', 'Controversial truth:', 'Hard reality:', 'Uncomfortable fact:', 'Bold statement:'];
+  
+  // Get random elements based on the unique ID
+  const randomTimeframe = timeframes[uniqueId % timeframes.length];
+  const randomInsight = insights[(uniqueId + randomSalt) % insights.length];
+  const randomSurprise = surprises[(uniqueId + seed) % surprises.length];
+  const randomControversial = controversials[uniqueId % controversials.length];
+  
+  // Extract random words from prompt for dynamic integration
+  const promptWords = prompt.split(' ').filter(word => word.length > 3);
+  const randomPromptWord = promptWords.length > 0 ? promptWords[uniqueId % promptWords.length] : 'professional growth';
+  
+  // Generate completely dynamic content based on tone and context
   if (tone === 'professional') {
-    if (isGraduation && isUCDavis) selectedHooks = toneVariations.graduation_ucdavis;
-    else if (isJobSearch && isAI) selectedHooks = toneVariations.jobsearch_ai;
-    else if (isAnalytics) selectedHooks = toneVariations.analytics;
-    else selectedHooks = toneVariations.general;
-  } else if (tone === 'casual') {
-    if (isGraduation && isUCDavis) selectedHooks = toneVariations.graduation_ucdavis;
-    else if (isJobSearch && isAI) selectedHooks = toneVariations.jobsearch_ai;
-    else if (isAnalytics) selectedHooks = toneVariations.analytics;
-    else selectedHooks = toneVariations.general;
-  } else { // bold
-    if (isGraduation) selectedHooks = toneVariations.graduation;
-    else if (isJobSearch && isAI) selectedHooks = toneVariations.jobsearch_ai;
-    else if (isAnalytics) selectedHooks = toneVariations.analytics;
-    else selectedHooks = toneVariations.general;
+    const professional_starters = [
+      \`\${randomTimeframe} in \${randomPromptWord} has fundamentally changed my approach to \${focus}.\`,
+      \`My journey through \${isUCDavis ? 'UC Davis and ' : ''}\${randomPromptWord} \${randomInsight} that success requires \${focus}.\`,
+      \`After \${randomTimeframe.toLowerCase()} of \${prompt.toLowerCase()}, I've discovered what truly drives \${focus}.\`,
+      \`The intersection of \${randomPromptWord} and \${focus} is creating opportunities I never expected.\`,
+      \`Working in \${randomPromptWord} has \${randomInsight} that \${focus} isn't what most people think.\`
+    ];
+    return professional_starters[uniqueId % professional_starters.length];
   }
   
-  return selectedHooks[variation % selectedHooks.length];
+  if (tone === 'casual') {
+    const casual_starters = [
+      \`\${randomSurprise} \${randomTimeframe} of \${randomPromptWord} and I finally get why \${focus} matters.\`,
+      \`Just spent \${randomTimeframe.toLowerCase()} in \${prompt.toLowerCase()} and here's what nobody tells you.\`,
+      \`\${randomSurprise} The hardest part of \${randomPromptWord} isn't the technical stuff.\`,
+      \`Six months ago I thought \${randomPromptWord} was about X. Turns out it's all about \${focus}.\`,
+      \`\${randomSurprise} \${randomPromptWord} \${randomInsight} me more about \${focus} than I expected.\`
+    ];
+    return casual_starters[uniqueId % casual_starters.length];
+  }
+  
+  // Bold tone
+  const bold_starters = [
+    \`\${randomControversial} The \${randomPromptWord} industry has \${focus} completely backwards.\`,
+    \`\${randomControversial} Most \${randomPromptWord} advice ignores the real driver of \${focus}.\`,
+    \`Everyone's obsessing over \${randomPromptWord} while missing what actually creates \${focus}.\`,
+    \`\${randomControversial} \${randomPromptWord} success has more to do with \${focus} than talent.\`,
+    \`The \${randomPromptWord} industry is broken because it prioritizes complexity over \${focus}.\`
+  ];
+  return bold_starters[uniqueId % bold_starters.length];
 }
 
 function generateContextualBody(tone: string, context: any): string {
+  const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt, seed, variation, focus, randomSalt } = context;
+  
+  const skillsList = skills.length > 0 ? skills.slice(0, 4).join(', ') : 'technical and analytical skills';
+  const degree = education.degree || 'graduate program';
+  const institution = education.institution || 'university';
+  
+  // Dynamic content generators
+  const timestamp = Date.now();
+  const uniqueId = (timestamp + randomSalt + seed) % 1000;
+  
+  // Random dynamic content pools
+  const challenges = ['messy real-world data', 'stakeholder expectations', 'budget constraints', 'timeline pressures', 'team dynamics', 'changing requirements'];
+  const outcomes = ['business impact', 'scalable solutions', 'measurable results', 'strategic value', 'competitive advantage', 'operational efficiency'];
+  const learnings = ['communication skills', 'strategic thinking', 'stakeholder management', 'project leadership', 'business acumen', 'technical depth'];
+  const insights = ['industry changes', 'market dynamics', 'customer behavior', 'technology trends', 'business needs', 'competitive landscape'];
+  
+  const randomChallenge = challenges[uniqueId % challenges.length];
+  const randomOutcome = outcomes[(uniqueId + randomSalt) % outcomes.length];
+  const randomLearning = learnings[(uniqueId + seed) % learnings.length];
+  const randomInsight = insights[uniqueId % insights.length];
+  
+  // Extract and use prompt context dynamically
+  const promptWords = prompt.split(' ').filter(word => word.length > 3);
+  const keyWord = promptWords.length > 0 ? promptWords[uniqueId % promptWords.length] : 'professional development';
+  
+  if (tone === 'professional') {
+    const professionalBodies = [
+      \`My experience with \${skillsList} and focus on \${keyWord} has revealed that sustainable \${focus} requires a systematic approach.
+
+Critical success factors I've identified:
+
+• Technical excellence combined with \${randomLearning}
+• Understanding \${randomInsight} and market context  
+• Building relationships that drive \${randomOutcome}
+• Continuous adaptation to \${randomChallenge}
+• Focus on \${randomOutcome} over technical complexity
+
+The professionals who consistently deliver \${randomOutcome} are those who master both the technical and \${randomLearning} aspects of their work.\`,
+
+      \`Through my work in \${keyWord} and expertise in \${skillsList}, I've learned that achieving \${focus} demands more than technical proficiency.
+
+Key insights from my journey:
+
+• \${randomLearning.charAt(0).toUpperCase() + randomLearning.slice(1)} often matters more than technical skills
+• Success requires navigating \${randomChallenge} effectively
+• Understanding \${randomInsight} drives strategic decisions
+• Building \${randomOutcome} requires cross-functional collaboration
+• Real impact comes from solving business problems, not showcasing technology
+
+The most successful professionals I know excel at translating technical capabilities into \${randomOutcome}.\`,
+
+      \`My journey with \${keyWord} has taught me that \${focus} isn't just about mastering \${skillsList}.
+
+What separates high-impact professionals:
+
+• Deep understanding of \${randomInsight} and customer needs
+• Ability to navigate \${randomChallenge} while maintaining quality
+• Focus on \${randomOutcome} rather than process perfection
+• Strong \${randomLearning} that enable team success
+• Strategic thinking that connects daily work to broader \${focus}
+
+The future belongs to those who can combine technical depth with \${randomLearning} to drive \${randomOutcome}.\`
+    ];
+    
+    return professionalBodies[uniqueId % professionalBodies.length];
+  }
+  
+  if (tone === 'casual') {
+    const casualBodies = [
+      \`Working on \${keyWord} taught me \${skillsList}, but the real world is teaching me everything about \${randomLearning}.
+
+What my \${degree} didn't prepare me for:
+
+• How much time you spend dealing with \${randomChallenge}
+• That \${randomLearning} often trumps technical expertise
+• How important understanding \${randomInsight} really is  
+• The politics behind every decision about \${randomOutcome}
+• That soft skills determine who actually drives \${focus}
+
+Turns out the technical stuff was just the entry fee. The human element is where \${focus} really happens.\`,
+
+      \`Six months into \${keyWord} and I finally understand why everyone talks about \${randomLearning}.
+
+Reality check on \${focus}:
+
+• It's 20% \${skillsList} and 80% everything else
+• Understanding \${randomInsight} matters more than perfect execution
+• \${randomChallenge} will test you more than any technical problem
+• Building \${randomOutcome} requires more \${randomLearning} than coding
+• The best opportunities go to people who can navigate both
+
+The sweet spot is being technical enough to be credible but focused enough on \${randomOutcome} to be valuable.\`,
+
+      \`Real talk about \${keyWord}: everyone focuses on \${skillsList}, but that's not where careers are made.
+
+What actually drives \${focus}:
+
+• Your ability to handle \${randomChallenge} under pressure
+• Understanding \${randomInsight} before your competitors do
+• Building relationships that create \${randomOutcome}
+• Developing \${randomLearning} that make teams better
+• Knowing when technical perfection matters vs when \${focus} matters more
+
+The professionals who get promoted aren't always the most technically skilled. They're the ones who consistently deliver \${randomOutcome}.\`
+    ];
+    
+    return casualBodies[uniqueId % casualBodies.length];
+  }
+  
+  // Bold tone
+  const boldBodies = [
+    \`After working in \${keyWord} for years, I've come to a controversial conclusion: the industry has \${focus} completely backwards.
+
+What we get wrong:
+
+• Obsession with \${skillsList} over understanding \${randomInsight}
+• Building solutions that impress technologists but ignore \${randomOutcome}
+• Treating \${randomChallenge} as edge cases instead of core challenges  
+• Prioritizing technical complexity over \${randomLearning}
+• Measuring success by sophistication rather than \${randomOutcome}
+
+The most successful professionals I know aren't the ones with the most impressive technical skills. They're the ones who can take complex \${skillsList} and apply them to create simple, valuable \${randomOutcome}.\`,
+
+    \`The \${keyWord} industry has convinced everyone they need more \${skillsList} when they really need better \${focus}.
+
+Hard truths about \${focus}:
+
+• Most companies are drowning in technical complexity but starving for \${randomOutcome}
+• \${randomChallenge} kills more projects than technical limitations
+• Understanding \${randomInsight} matters more than perfect algorithms
+• \${randomLearning} determine who actually drives change
+• The gap between what's technically possible and what's actually valuable is enormous
+
+We're optimizing for the wrong metrics while the real drivers of \${randomOutcome} go ignored.\`,
+
+    \`Unpopular opinion: The \${keyWord} field is broken because we prioritize \${skillsList} over \${focus}.
+
+What needs to change:
+
+• Stop treating \${randomChallenge} as someone else's problem
+• Focus on \${randomOutcome} instead of technical perfection
+• Invest in \${randomLearning} as much as technical skills
+• Understand \${randomInsight} before building solutions
+• Measure impact by \${randomOutcome}, not technical sophistication
+
+The future belongs to professionals who can bridge the gap between technical capability and real-world \${focus}.\`
+  ];
+  
+  return boldBodies[uniqueId % boldBodies.length];
+}
   const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt, seed, variation, focus } = context;
   
   const skillsList = skills.length > 0 ? skills.slice(0, 4).join(', ') : 'technical and analytical skills';
@@ -393,9 +503,53 @@ function generateContextualBody(tone: string, context: any): string {
 }
 
 function generateContextualCTA(tone: string, context: any): string {
-  const { isGraduation, isJobSearch, isAI, isAnalytics, isWork, seed, variation, focus } = context;
+  const { isGraduation, isJobSearch, isAI, isAnalytics, isWork, seed, variation, focus, randomSalt } = context;
   
-  // Create multiple CTA variations
+  // Dynamic CTA generation
+  const timestamp = Date.now();
+  const uniqueId = (timestamp + randomSalt + seed) % 1000;
+  
+  // Random dynamic elements for CTAs
+  const questions = ['What has been your experience', 'How are you handling', 'What surprised you most about', 'What advice would you give', 'How do you balance', 'What challenges have you faced'];
+  const topics = ['career transitions', 'skill development', 'industry changes', 'professional growth', 'work-life balance', 'team collaboration'];
+  const engagements = ['Share your thoughts!', 'Drop your experiences below!', 'Would love to hear your perspective!', 'What do you think?', 'Curious about your take!', 'Let me know in the comments!'];
+  
+  const randomQuestion = questions[uniqueId % questions.length];
+  const randomTopic = topics[(uniqueId + randomSalt) % topics.length];
+  const randomEngagement = engagements[(uniqueId + seed) % engagements.length];
+  
+  if (tone === 'professional') {
+    const professionalCTAs = [
+      \`\${randomQuestion} with \${focus} in your professional journey? I'd welcome insights from fellow professionals.\`,
+      \`Fellow professionals - \${randomQuestion.toLowerCase()} \${randomTopic} and \${focus}? \${randomEngagement}\`,
+      \`\${randomQuestion} balancing technical excellence with \${focus}? Looking forward to your perspectives.\`,
+      \`What strategies have proven most effective for achieving \${focus} in your field? \${randomEngagement}\`,
+      \`How do you approach \${randomTopic} while maintaining focus on \${focus}? Interested in your approaches.\`
+    ];
+    return professionalCTAs[uniqueId % professionalCTAs.length];
+  }
+  
+  if (tone === 'casual') {
+    const casualCTAs = [
+      \`\${randomQuestion} with \${randomTopic}? \${randomEngagement}\`,
+      \`Fellow professionals - \${randomQuestion.toLowerCase()} \${focus} in your day-to-day work?\`,
+      \`Anyone else dealing with \${randomTopic}? What's working for you?\`,
+      \`\${randomQuestion} navigating \${focus}? Drop your stories below!\`,
+      \`What's your take on \${randomTopic} and \${focus}? \${randomEngagement}\`
+    ];
+    return casualCTAs[uniqueId % casualCTAs.length];
+  }
+  
+  // Bold tone
+  const boldCTAs = [
+    \`\${randomQuestion} challenging the status quo in \${randomTopic}? Time for some real talk.\`,
+    \`What industry assumption about \${focus} needs to be called out? \${randomEngagement}\`,
+    \`\${randomQuestion} driving real change in \${randomTopic}? Let's discuss.\`,
+    \`What controversial opinion do you have about \${focus}? Ready for the debate!\`,
+    \`Which \${randomTopic} trend is completely overrated? \${randomEngagement}\`
+  ];
+  return boldCTAs[uniqueId % boldCTAs.length];
+}
   const ctaVariations = {
     professional: {
       graduation: [
