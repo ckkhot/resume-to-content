@@ -12,123 +12,114 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Function invoked');
-    const { prompt, resumeData } = await req.json()
-    console.log('Request body parsed:', { prompt: prompt?.substring(0, 50) + '...', hasResumeData: !!resumeData });
+    console.log('=== Function started ===');
     
-    // Get OpenAI API key from environment
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
-    console.log('OpenAI API key present:', !!openaiApiKey);
-    if (!openaiApiKey) {
-      throw new Error('OpenAI API key not found')
+    // Parse request body
+    let requestBody;
+    try {
+      requestBody = await req.json();
+      console.log('✅ Request body parsed');
+    } catch (e) {
+      console.error('❌ Failed to parse request body:', e);
+      throw new Error('Invalid JSON in request body');
     }
 
-    // Create authorization header
-    const authHeader = req.headers.get('Authorization')!
+    const { prompt } = requestBody;
+    if (!prompt) {
+      throw new Error('Prompt is required');
+    }
+    console.log('✅ Prompt received:', prompt.substring(0, 50) + '...');
+    
+    // Check OpenAI API key
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      console.error('❌ OpenAI API key not found');
+      throw new Error('OpenAI API key not configured');
+    }
+    console.log('✅ OpenAI API key found');
+
+    // Check auth header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('❌ No authorization header');
+      throw new Error('Authorization header missing');
+    }
+    console.log('✅ Auth header present');
+
+    // Create Supabase client and verify user
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
-    )
+    );
 
-    // Get user from token
-    const { data: { user } } = await supabaseClient.auth.getUser()
-    if (!user) throw new Error('Unauthorized')
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('❌ Auth failed:', authError);
+      throw new Error('User authentication failed');
+    }
+    console.log('✅ User authenticated:', user.id);
 
-    // Prepare system prompt with resume context
-    const systemPrompt = `You are a LinkedIn content expert. Generate 3 high-quality LinkedIn posts based on the user's resume and prompt.
+    // Create test posts without OpenAI for now to isolate the issue
+    const testPosts = [
+      {
+        tone: 'professional',
+        hook: 'Exciting career milestone ahead! 🎯',
+        body: `Just received an incredible internship offer in analytics and AI at a Y Combinator company. This opportunity represents everything I've been working toward - combining cutting-edge technology with real-world impact.
 
-Resume context: ${resumeData ? JSON.stringify(resumeData) : 'No resume data provided'}
+The journey to get here involved countless hours of skill development, networking, and perseverance. Every rejection taught me something new, and every small win built momentum toward this moment.
 
-Generate posts in different tones:
-1. Professional and insightful
-2. Casual and relatable  
-3. Bold and attention-grabbing
-
-Each post should have:
-- A compelling hook (1-2 lines)
-- A narrative body with specific examples
-- A clear call-to-action
-
-Return as JSON array with objects containing: { tone, hook, body, cta }`
-
-    console.log('Making OpenAI API call...');
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json',
+I'm grateful for the mentors, peers, and experiences that shaped this path. Sometimes the best opportunities come when preparation meets possibility.`,
+        cta: 'What's been your biggest career breakthrough this year? Share your story below! 👇'
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.8,
-        max_tokens: 2000,
-      }),
-    })
+      {
+        tone: 'casual',
+        hook: 'Plot twist: Dreams do come true! ✨',
+        body: `Okay, I literally can't contain my excitement right now. Just got the call - I landed an internship at a YC company working on analytics and AI! 🤯
 
-    console.log('OpenAI response status:', response.status);
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI API error details:', errorText);
-      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`)
-    }
+Still feels surreal. All those late nights grinding on projects, the nerve-wracking interviews, the moments of self-doubt... it all led to this. Sometimes the universe really does reward hard work and persistence.
 
-    const openaiResult = await response.json()
-    console.log('OpenAI result received');
-    let posts
+This is just the beginning, but wow - what a beginning it is. Ready to learn, contribute, and maybe even change the world a little bit along the way.`,
+        cta: 'Drop a 🔥 if you believe persistence pays off! Let's celebrate wins together 🎉'
+      },
+      {
+        tone: 'bold',
+        hook: 'Breaking: The future just got brighter! 🚀',
+        body: `NEWS FLASH: Your girl just secured an internship at a Y Combinator analytics and AI company! This isn't just a job - it's a launching pad into the future of technology.
 
-    try {
-      posts = JSON.parse(openaiResult.choices[0].message.content)
-    } catch (e) {
-      // Fallback if JSON parsing fails
-      const content = openaiResult.choices[0].message.content
-      posts = [
-        {
-          tone: 'professional',
-          hook: 'Professional insight generated',
-          body: content,
-          cta: 'What are your thoughts?'
-        }
-      ]
-    }
+Here's what this means: I'll be working alongside brilliant minds, solving problems that matter, and contributing to innovations that could shape entire industries. The learning curve will be steep, but that's exactly where I thrive.
 
-    // Save posts to database
-    const { data: savedPosts, error: saveError } = await supabaseClient
-      .from('linkedin_posts')
-      .insert(
-        posts.map((post: any) => ({
-          user_id: user.id,
-          title: post.hook,
-          content: `${post.hook}\n\n${post.body}\n\n${post.cta}`,
-          post_type: 'generated',
-          tone: post.tone || 'professional'
-        }))
-      )
-      .select()
+To everyone who said "analytics and AI are too competitive" or "you need more experience" - watch this space. Sometimes you don't wait for permission to level up. You create your own opportunities.`,
+        cta: 'Who else is ready to disrupt their industry? Tag someone who needs to see this! 💪'
+      }
+    ];
 
-    if (saveError) {
-      console.error('Error saving posts:', saveError)
-    }
+    console.log('✅ Test posts created');
 
     return new Response(
-      JSON.stringify({ posts, savedPosts }),
+      JSON.stringify({ 
+        posts: testPosts,
+        message: 'Posts generated successfully (test mode)'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       },
-    )
+    );
+
   } catch (error) {
-    console.error('Error:', error)
+    console.error('❌ Function error:', error.message);
+    console.error('Stack:', error.stack);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        timestamp: new Date().toISOString()
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       },
-    )
+    );
   }
 })
