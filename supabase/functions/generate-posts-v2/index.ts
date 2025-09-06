@@ -161,7 +161,9 @@ Generate 3 completely unique LinkedIn posts about this topic. Each post should o
 // Intelligent fallback function that creates truly dynamic posts
 function generateIntelligentFallback(prompt: string, resumeData: any, userContext: string): any[] {
   const timestamp = Date.now();
-  const randomSeed = Math.floor(Math.random() * 1000);
+  const sessionSeed = Math.floor(Math.random() * 10000);
+  
+  console.log(`🎲 Session seed: ${sessionSeed} for prompt: "${prompt}"`);
   
   // Extract key information
   const name = resumeData?.name || 'Professional';
@@ -176,59 +178,150 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
   const isJobSearch = promptLower.includes('job') || promptLower.includes('opportunity') || promptLower.includes('career');
   const isAI = promptLower.includes('ai') || promptLower.includes('artificial intelligence') || promptLower.includes('machine learning');
   const isGrowth = promptLower.includes('growth') || promptLower.includes('development');
+  const isWork = promptLower.includes('work') || promptLower.includes('company') || promptLower.includes('project');
   
-  // Generate context-aware posts
-  const posts = [
-    {
-      tone: 'professional',
-      hook: generateContextualHook('professional', { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, prompt, randomSeed }),
-      body: generateContextualBody('professional', { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, prompt }),
-      cta: generateContextualCTA('professional', { isGraduation, isJobSearch, isAI, isAnalytics })
+  // Create unique context for each post
+  const contexts = [
+    { 
+      tone: 'professional', 
+      seed: sessionSeed + 1,
+      variation: sessionSeed % 3,
+      focus: isJobSearch ? 'strategy' : isGraduation ? 'learning' : 'expertise'
     },
-    {
-      tone: 'casual',
-      hook: generateContextualHook('casual', { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, prompt, randomSeed }),
-      body: generateContextualBody('casual', { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, prompt }),
-      cta: generateContextualCTA('casual', { isGraduation, isJobSearch, isAI, isAnalytics })
+    { 
+      tone: 'casual', 
+      seed: sessionSeed + 2,
+      variation: (sessionSeed + 1) % 3,
+      focus: isWork ? 'experience' : isAI ? 'innovation' : 'journey'
     },
-    {
-      tone: 'bold',
-      hook: generateContextualHook('bold', { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, prompt, randomSeed }),
-      body: generateContextualBody('bold', { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, prompt }),
-      cta: generateContextualCTA('bold', { isGraduation, isJobSearch, isAI, isAnalytics })
+    { 
+      tone: 'bold', 
+      seed: sessionSeed + 3,
+      variation: (sessionSeed + 2) % 3,
+      focus: isAnalytics ? 'disruption' : isGrowth ? 'transformation' : 'breakthrough'
     }
   ];
   
-  console.log('✅ Generated 3 intelligent fallback posts with context');
+  // Generate varied posts
+  const posts = contexts.map(ctx => ({
+    tone: ctx.tone,
+    hook: generateContextualHook(ctx.tone, { 
+      name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, isWork, prompt, 
+      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus 
+    }),
+    body: generateContextualBody(ctx.tone, { 
+      name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt,
+      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus
+    }),
+    cta: generateContextualCTA(ctx.tone, { 
+      isGraduation, isJobSearch, isAI, isAnalytics, isWork,
+      seed: ctx.seed, variation: ctx.variation, focus: ctx.focus
+    })
+  }));
+  
+  console.log(`✅ Generated 3 unique fallback posts with variations: ${contexts.map(c => c.variation).join(', ')}`);
   return posts;
 }
 
 function generateContextualHook(tone: string, context: any): string {
-  const { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, prompt, randomSeed } = context;
+  const { name, isGraduation, isJobSearch, isAI, isUCDavis, isAnalytics, isWork, prompt, seed, variation, focus } = context;
+  
+  // Create multiple variations for each condition
+  const variations = {
+    professional: {
+      graduation_ucdavis: [
+        'Completing my MS in Business Analytics at UC Davis has fundamentally shifted my perspective on data-driven leadership.',
+        'My graduate experience at UC Davis taught me that analytics mastery requires more than technical skills.',
+        'UC Davis equipped me with analytical frameworks, but real-world application taught me everything else.'
+      ],
+      jobsearch_ai: [
+        'The intersection of AI and business strategy is creating unprecedented career opportunities.',
+        'After deep research into AI career paths, I\'ve identified the skills that truly matter.',
+        'Three months of AI job market analysis revealed surprising patterns about what employers actually want.'
+      ],
+      analytics: [
+        'Five years in analytics has taught me that storytelling trumps statistical sophistication.',
+        'The most successful analytics professionals I know share one unexpected trait.',
+        'Analytics taught me that the right question matters more than the perfect model.'
+      ],
+      general: [
+        `My experience with ${prompt.split(' ').slice(0,2).join(' ')} has challenged conventional wisdom in surprising ways.`,
+        `After extensive work in ${prompt.split(' ')[0]}, I've discovered what truly drives sustainable success.`,
+        `Three key insights from my ${prompt.split(' ')[0]} journey that every professional should consider.`
+      ]
+    },
+    casual: {
+      graduation_ucdavis: [
+        'Just wrapped up my MS at UC Davis and honestly, the real education starts now.',
+        'UC Davis gave me the technical foundation, but LinkedIn is teaching me how careers actually work.',
+        'Fresh out of grad school at UC Davis with some thoughts on what they don\'t teach you.'
+      ],
+      jobsearch_ai: [
+        'Here\'s what nobody tells you about breaking into AI and growth roles.',
+        'Six months of AI job hunting taught me more than any course could.',
+        'The AI job market is wild right now - here\'s what I\'ve learned from 50+ applications.'
+      ],
+      analytics: [
+        'Plot twist: The hardest part of analytics isn\'t the math or the code.',
+        'Three years in analytics and I finally understand why soft skills matter more.',
+        'Analytics bootcamps prepare you for everything except the actual job.'
+      ],
+      general: [
+        `Real talk about ${prompt.toLowerCase()} - it's not what most people think.`,
+        `Six months deep into ${prompt.split(' ')[0]} and here's what surprised me most.`,
+        `Nobody warned me that ${prompt.split(' ')[0]} would be 20% technical work and 80% everything else.`
+      ]
+    },
+    bold: {
+      graduation: [
+        'Hot take: Most graduate programs are preparing students for jobs that don\'t exist anymore.',
+        'Unpopular opinion: Graduate school teaches you to be an expert in fields that are rapidly becoming obsolete.',
+        'Controversial truth: The skills that got me through grad school are barely relevant in the real world.'
+      ],
+      jobsearch_ai: [
+        'Everyone\'s rushing into AI without understanding what actually drives business value.',
+        'The AI job market is a bubble built on buzzwords rather than genuine business needs.',
+        'Most AI roles are just data analyst positions with inflated titles and salaries.'
+      ],
+      analytics: [
+        'Most companies are drowning in data but still making gut-based decisions.',
+        'Analytics is broken: We\'re optimizing metrics that don\'t matter while ignoring what actually drives growth.',
+        'The analytics industry has convinced everyone they need more data when they really need better decisions.'
+      ],
+      general: [
+        `Controversial opinion: The ${prompt.split(' ')[0]} industry has it completely backwards.`,
+        `Hard truth: Most ${prompt.split(' ')[0]} advice is outdated by the time you hear it.`,
+        `Unpopular take: ${prompt.split(' ')[0]} success has more to do with timing than talent.`
+      ]
+    }
+  };
+
+  // Select variation based on seed
+  const toneVariations = variations[tone as keyof typeof variations];
+  let selectedHooks: string[] = [];
   
   if (tone === 'professional') {
-    if (isGraduation && isUCDavis) return `Completing my MS in Business Analytics at UC Davis has fundamentally changed how I approach data-driven decision making. [${randomSeed}]`;
-    if (isJobSearch && isAI) return `The intersection of AI and business strategy is where the most impactful career opportunities exist today. [${randomSeed}]`;
-    if (isAnalytics) return `Three years in analytics has taught me that technical skills are just the foundation of real business impact. [${randomSeed}]`;
-    return `My journey in ${prompt.split(' ')[0]} has revealed insights that every professional should understand. [${randomSeed}]`;
+    if (isGraduation && isUCDavis) selectedHooks = toneVariations.graduation_ucdavis;
+    else if (isJobSearch && isAI) selectedHooks = toneVariations.jobsearch_ai;
+    else if (isAnalytics) selectedHooks = toneVariations.analytics;
+    else selectedHooks = toneVariations.general;
+  } else if (tone === 'casual') {
+    if (isGraduation && isUCDavis) selectedHooks = toneVariations.graduation_ucdavis;
+    else if (isJobSearch && isAI) selectedHooks = toneVariations.jobsearch_ai;
+    else if (isAnalytics) selectedHooks = toneVariations.analytics;
+    else selectedHooks = toneVariations.general;
+  } else { // bold
+    if (isGraduation) selectedHooks = toneVariations.graduation;
+    else if (isJobSearch && isAI) selectedHooks = toneVariations.jobsearch_ai;
+    else if (isAnalytics) selectedHooks = toneVariations.analytics;
+    else selectedHooks = toneVariations.general;
   }
   
-  if (tone === 'casual') {
-    if (isGraduation && isUCDavis) return `Just wrapped up my MS at UC Davis and honestly, the real learning starts now. [${randomSeed}]`;
-    if (isJobSearch && isAI) return `Here's what nobody tells you about breaking into AI and growth roles. [${randomSeed}]`;
-    if (isAnalytics) return `Plot twist: The hardest part of analytics isn't the math or the code. [${randomSeed}]`;
-    return `Real talk about ${prompt.toLowerCase()} - it's not what most people think. [${randomSeed}]`;
-  }
-  
-  // Bold tone
-  if (isGraduation) return `Hot take: Most graduate programs are preparing students for jobs that don't exist anymore. [${randomSeed}]`;
-  if (isJobSearch && isAI) return `Everyone's rushing into AI without understanding what actually drives business value. [${randomSeed}]`;
-  if (isAnalytics) return `Most companies are drowning in data but still making gut-based decisions. [${randomSeed}]`;
-  return `Controversial opinion: The ${prompt.split(' ')[0]} industry has it completely backwards. [${randomSeed}]`;
+  return selectedHooks[variation % selectedHooks.length];
 }
 
 function generateContextualBody(tone: string, context: any): string {
-  const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, prompt } = context;
+  const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt, seed, variation, focus } = context;
   
   const skillsList = skills.length > 0 ? skills.slice(0, 4).join(', ') : 'technical and analytical skills';
   const degree = education.degree || 'graduate program';
@@ -271,25 +364,85 @@ function generateContextualBody(tone: string, context: any): string {
 }
 
 function generateContextualCTA(tone: string, context: any): string {
-  const { isGraduation, isJobSearch, isAI, isAnalytics } = context;
+  const { isGraduation, isJobSearch, isAI, isAnalytics, isWork, seed, variation, focus } = context;
   
-  if (tone === 'professional') {
-    if (isGraduation) return 'Fellow recent graduates - what has been your biggest learning curve transitioning from academic theory to professional practice?';
-    if (isJobSearch && isAI) return 'AI and analytics professionals - what business problem are you most excited to solve? Share your perspectives.';
-    if (isAnalytics) return 'Analytics professionals - what has been your experience bridging technical expertise with business strategy?';
-    return 'What has been your experience balancing technical depth with broader business understanding?';
-  }
+  // Create multiple CTA variations
+  const ctaVariations = {
+    professional: {
+      graduation: [
+        'Fellow recent graduates - what has been your biggest learning curve transitioning from academic theory to professional practice?',
+        'Recent grads - what industry reality surprised you most? Share your transition insights.',
+        'New graduates - how are you bridging the gap between classroom learning and real-world application?'
+      ],
+      jobsearch_ai: [
+        'AI and analytics professionals - what business problem are you most excited to solve? Share your perspectives.',
+        'Fellow AI professionals - what skills gap surprised you most in the current job market?',
+        'AI and data professionals - what\'s the most impactful project you\'ve worked on recently?'
+      ],
+      analytics: [
+        'Analytics professionals - what has been your experience bridging technical expertise with business strategy?',
+        'Data professionals - what soft skill has had the biggest impact on your career progression?',
+        'Fellow analysts - what business metric do you think is most overrated? Most underrated?'
+      ],
+      general: [
+        'What has been your experience balancing technical depth with broader business understanding?',
+        'Fellow professionals - what industry trend are you most excited about in the coming year?',
+        'What unexpected skill has been most valuable in your career journey so far?'
+      ]
+    },
+    casual: {
+      graduation: [
+        'Other recent grads - what surprised you most about the transition to professional life? Would love to hear your stories.',
+        'Fellow new grads - what\'s the weirdest thing about corporate life that no one warned you about?',
+        'Recent graduates - what advice would you give your college self? Drop it in the comments!'
+      ],
+      jobsearch_ai: [
+        'Anyone else navigating the AI job market? What opportunities are you most excited about?',
+        'Fellow job seekers in tech - what interview question caught you most off guard?',
+        'AI job hunters - what skill are you working on that you wish you\'d started earlier?'
+      ],
+      analytics: [
+        'Fellow data folks - what soft skill has surprised you the most in terms of career impact?',
+        'Other analytics professionals - what\'s the most ridiculous data request you\'ve ever received?',
+        'Data people - what tool or technique completely changed how you work?'
+      ],
+      general: [
+        'What unexpected skills have been most valuable in your career journey? Share your experiences!',
+        'Fellow professionals - what industry myth did you believe for way too long?',
+        'What\'s the best career advice you\'ve ever received? (And the worst?)'
+      ]
+    },
+    bold: {
+      graduation: [
+        'Fellow grads - what industry reality check hit you hardest? Let\'s discuss what needs to change in education.',
+        'Recent graduates - what sacred cow in higher education needs to be challenged? Speak up.',
+        'New professionals - what skill should universities be teaching but aren\'t? Time for honest feedback.'
+      ],
+      jobsearch_ai: [
+        'Ready to have an honest conversation about AI hype vs. reality? What problems actually need solving?',
+        'AI professionals - what buzzword needs to die? What concept needs more attention?',
+        'Fellow tech professionals - what AI application is most overrated? Most underrated?'
+      ],
+      analytics: [
+        'Time for some honest reflection - what analytics project seemed impressive but delivered zero business value?',
+        'Analytics professionals - what metric is everyone tracking that actually doesn\'t matter?',
+        'Data folks - what\'s the most expensive analytics mistake you\'ve seen? (Names redacted, lessons shared.)'
+      ],
+      general: [
+        'What sacred cow in your industry needs to be challenged? Drop your controversial takes below.',
+        'Fellow professionals - what widely accepted practice in your field is actually counterproductive?',
+        'What industry emperor has no clothes? Time for some honest conversation.'
+      ]
+    }
+  };
   
-  if (tone === 'casual') {
-    if (isGraduation) return 'Other recent grads - what surprised you most about the transition to professional life? Would love to hear your stories.';
-    if (isJobSearch && isAI) return 'Anyone else navigating the AI job market? What opportunities are you most excited about?';
-    if (isAnalytics) return 'Fellow data folks - what soft skill has surprised you the most in terms of career impact?';
-    return 'What unexpected skills have been most valuable in your career journey? Share your experiences!';
-  }
+  const toneVariations = ctaVariations[tone as keyof typeof ctaVariations];
+  let selectedCTAs: string[] = [];
   
-  // Bold tone
-  if (isGraduation) return 'Fellow grads - what industry reality check hit you hardest? Let\'s discuss what needs to change in education.';
-  if (isJobSearch && isAI) return 'Ready to have an honest conversation about AI hype vs. reality? What problems actually need solving?';
-  if (isAnalytics) return 'Time for some honest reflection - what analytics project seemed impressive but delivered zero business value?';
-  return 'What sacred cow in your industry needs to be challenged? Drop your controversial takes below.';
+  if (isGraduation) selectedCTAs = toneVariations.graduation;
+  else if (isJobSearch && isAI) selectedCTAs = toneVariations.jobsearch_ai;
+  else if (isAnalytics) selectedCTAs = toneVariations.analytics;
+  else selectedCTAs = toneVariations.general;
+  
+  return selectedCTAs[variation % selectedCTAs.length];
 }
