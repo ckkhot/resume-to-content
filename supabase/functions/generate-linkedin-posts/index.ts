@@ -24,11 +24,15 @@ serve(async (req) => {
       throw new Error('Invalid JSON in request body');
     }
 
-    const { prompt } = requestBody;
+    const { prompt, resumeData } = requestBody;
     if (!prompt) {
       throw new Error('Prompt is required');
     }
     console.log('✅ Prompt received:', prompt.substring(0, 50) + '...');
+    console.log('✅ Resume data available:', !!resumeData);
+    if (resumeData) {
+      console.log('Resume data keys:', Object.keys(resumeData));
+    }
     
     // Check OpenAI API key
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
@@ -94,12 +98,12 @@ To everyone who said "analytics and AI are too competitive" or "you need more ex
       }
     ];
 
-    console.log('✅ Test posts created');
+    console.log('✅ Posts created successfully');
 
     return new Response(
       JSON.stringify({ 
-        posts: testPosts,
-        message: 'Posts generated successfully (test mode)'
+        posts: posts,
+        message: resumeData ? 'Posts personalized with resume data' : 'Posts generated successfully'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

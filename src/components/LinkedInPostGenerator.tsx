@@ -20,6 +20,7 @@ interface GeneratedPost {
 export const LinkedInPostGenerator = () => {
   const { user, loading, signOut } = useAuth();
   const [resumeUploaded, setResumeUploaded] = useState(false);
+  const [resumeData, setResumeData] = useState<any>(null);
   const [prompt, setPrompt] = useState("");
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -48,7 +49,7 @@ export const LinkedInPostGenerator = () => {
       const { data, error } = await supabase.functions.invoke('generate-linkedin-posts', {
         body: { 
           prompt: prompt,
-          resumeData: null // Will be populated when resume processing is implemented
+          resumeData: resumeData // Now passes actual resume data
         }
       });
 
@@ -101,7 +102,10 @@ export const LinkedInPostGenerator = () => {
           {/* Left Sidebar - Resume Upload */}
           <div className="lg:col-span-1">
             <ResumeUpload 
-              onUploadComplete={() => setResumeUploaded(true)}
+              onUploadComplete={(data) => {
+                setResumeUploaded(true);
+                setResumeData(data);
+              }}
               isUploaded={resumeUploaded}
             />
           </div>

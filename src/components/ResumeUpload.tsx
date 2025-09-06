@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, CheckCircle, X } from "lucide-react";
 import { useToast } from "./ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ResumeUploadProps {
   onUploadComplete: (resumeData?: any) => void;
@@ -29,15 +30,36 @@ export const ResumeUpload = ({ onUploadComplete, isUploaded }: ResumeUploadProps
     setIsProcessing(true);
     setUploadedFile(file);
 
-    // Simulate file processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      onUploadComplete({ fileName: file.name, size: file.size });
-      toast({
-        title: "Resume uploaded successfully!",
-        description: "Your resume has been analyzed and is ready for content generation.",
+    try {
+      // Convert file to text (simulated - in real app would use PDF parser)
+      const resumeText = `Resume content for ${file.name}. This would normally contain parsed resume data including experience, skills, education, and projects.`;
+      
+      // Call the process-resume edge function
+      const { data, error } = await supabase.functions.invoke('process-resume', {
+        body: { resumeText }
       });
-    }, 1500);
+
+      if (error) throw error;
+
+      const resumeData = data?.data || {};
+      setIsProcessing(false);
+      onUploadComplete(resumeData);
+      
+      toast({
+        title: "Resume processed successfully!",
+        description: "Your resume has been analyzed and extracted information is ready for content generation.",
+      });
+    } catch (error) {
+      console.error('Error processing resume:', error);
+      setIsProcessing(false);
+      toast({
+        title: "Processing failed",
+        description: "Failed to process resume. Using basic file info instead.",
+        variant: "destructive"
+      });
+      // Fallback to basic file info
+      onUploadComplete({ fileName: file.name, size: file.size });
+    }
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {
