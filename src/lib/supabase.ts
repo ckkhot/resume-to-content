@@ -1,15 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
 // Lovable automatically injects Supabase credentials when connected
-// These environment variables should be available through the integration
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// For development: If env vars aren't set, use placeholder values
-// In production with Lovable + Supabase integration, these will be auto-injected
+// For development: Use valid placeholder URLs that won't break the URL constructor
+// In production with Lovable + Supabase integration, real values will be auto-injected
 export const supabase = createClient(
-  supabaseUrl || 'placeholder-url',
-  supabaseAnonKey || 'placeholder-key'
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder'
 )
 
 export type Database = {
