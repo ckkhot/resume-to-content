@@ -332,31 +332,31 @@ function generateContextualBody(tone: string, context: any): string {
     const { name, skills, education, isGraduation, isJobSearch, isAI, isAnalytics, isUCDavis, isWork, prompt, seed, variation, focus, randomSalt } = context;
     
     const skillsList = (skills && skills.length > 0) ? skills.slice(0, 4).join(', ') : 'technical and analytical skills';
-  const degree = education.degree || 'graduate program';
-  const institution = education.institution || 'university';
-  
-  // Dynamic content generators
-  const timestamp = Date.now();
-  const uniqueId = (timestamp + (randomSalt || 0) + (seed || 0)) % 1000;
-  
-  // Random dynamic content pools
-  const challenges = ['messy real-world data', 'stakeholder expectations', 'budget constraints', 'timeline pressures', 'team dynamics', 'changing requirements'];
-  const outcomes = ['business impact', 'scalable solutions', 'measurable results', 'strategic value', 'competitive advantage', 'operational efficiency'];
-  const learnings = ['communication skills', 'strategic thinking', 'stakeholder management', 'project leadership', 'business acumen', 'technical depth'];
-  const insights = ['industry changes', 'market dynamics', 'customer behavior', 'technology trends', 'business needs', 'competitive landscape'];
-  
-  const randomChallenge = challenges[uniqueId % challenges.length];
-  const randomOutcome = outcomes[(uniqueId + (randomSalt || 0)) % outcomes.length];
-  const randomLearning = learnings[(uniqueId + (seed || 0)) % learnings.length];
-  const randomInsight = insights[uniqueId % insights.length];
-  
-  // Extract and use prompt context dynamically with null safety
-  const promptWords = (prompt || '').split(' ').filter(word => word.length > 3);
-  const keyWord = promptWords.length > 0 ? promptWords[uniqueId % promptWords.length] : 'professional development';
-  
-  if (tone === 'professional') {
-    const professionalBodies = [
-      `My experience with ${skillsList} and focus on ${keyWord} has revealed that sustainable ${focus} requires a systematic approach.
+    const degree = (education && education.degree) || 'graduate program';
+    const institution = (education && education.institution) || 'university';
+    
+    // Dynamic content generators
+    const timestamp = Date.now();
+    const uniqueId = (timestamp + (randomSalt || 0) + (seed || 0)) % 1000;
+    
+    // Random dynamic content pools
+    const challenges = ['messy real-world data', 'stakeholder expectations', 'budget constraints', 'timeline pressures', 'team dynamics', 'changing requirements'];
+    const outcomes = ['business impact', 'scalable solutions', 'measurable results', 'strategic value', 'competitive advantage', 'operational efficiency'];
+    const learnings = ['communication skills', 'strategic thinking', 'stakeholder management', 'project leadership', 'business acumen', 'technical depth'];
+    const insights = ['industry changes', 'market dynamics', 'customer behavior', 'technology trends', 'business needs', 'competitive landscape'];
+    
+    const randomChallenge = challenges[uniqueId % challenges.length];
+    const randomOutcome = outcomes[(uniqueId + (randomSalt || 0)) % outcomes.length];
+    const randomLearning = learnings[(uniqueId + (seed || 0)) % learnings.length];
+    const randomInsight = insights[uniqueId % insights.length];
+    
+    // Extract and use prompt context dynamically with null safety
+    const promptWords = (prompt || '').split(' ').filter(word => word.length > 3);
+    const keyWord = promptWords.length > 0 ? promptWords[uniqueId % promptWords.length] : 'professional development';
+    
+    if (tone === 'professional') {
+      const professionalBodies = [
+        `My experience with ${skillsList} and focus on ${keyWord} has revealed that sustainable ${focus} requires a systematic approach.
 
 Critical success factors I've identified:
 
@@ -368,7 +368,7 @@ Critical success factors I've identified:
 
 The professionals who consistently deliver ${randomOutcome} are those who master both the technical and ${randomLearning} aspects of their work.`,
 
-      `Through my work in ${keyWord} and expertise in ${skillsList}, I've learned that achieving ${focus} demands more than technical proficiency.
+        `Through my work in ${keyWord} and expertise in ${skillsList}, I've learned that achieving ${focus} demands more than technical proficiency.
 
 Key insights from my journey:
 
@@ -380,7 +380,7 @@ Key insights from my journey:
 
 The most successful professionals I know excel at translating technical capabilities into ${randomOutcome}.`,
 
-      `My journey with ${keyWord} has taught me that ${focus} isn't just about mastering ${skillsList}.
+        `My journey with ${keyWord} has taught me that ${focus} isn't just about mastering ${skillsList}.
 
 What separates high-impact professionals:
 
@@ -391,14 +391,14 @@ What separates high-impact professionals:
 • Strategic thinking that connects daily work to broader ${focus}
 
 The future belongs to those who can combine technical depth with ${randomLearning} to drive ${randomOutcome}.`
-    ];
+      ];
+      
+      return professionalBodies[uniqueId % professionalBodies.length];
+    }
     
-    return professionalBodies[uniqueId % professionalBodies.length];
-  }
-  
-  if (tone === 'casual') {
-    const casualBodies = [
-      `Working on ${keyWord} taught me ${skillsList}, but the real world is teaching me everything about ${randomLearning}.
+    if (tone === 'casual') {
+      const casualBodies = [
+        `Working on ${keyWord} taught me ${skillsList}, but the real world is teaching me everything about ${randomLearning}.
 
 What my ${degree} didn't prepare me for:
 
@@ -410,7 +410,7 @@ What my ${degree} didn't prepare me for:
 
 Turns out the technical stuff was just the entry fee. The human element is where ${focus} really happens.`,
 
-      `Six months into ${keyWord} and I finally understand why everyone talks about ${randomLearning}.
+        `Six months into ${keyWord} and I finally understand why everyone talks about ${randomLearning}.
 
 Reality check on ${focus}:
 
@@ -422,7 +422,7 @@ Reality check on ${focus}:
 
 The sweet spot is being technical enough to be credible but focused enough on ${randomOutcome} to be valuable.`,
 
-      `Real talk about ${keyWord}: everyone focuses on ${skillsList}, but that's not where careers are made.
+        `Real talk about ${keyWord}: everyone focuses on ${skillsList}, but that's not where careers are made.
 
 What actually drives ${focus}:
 
@@ -433,15 +433,15 @@ What actually drives ${focus}:
 • Knowing when technical perfection matters vs when ${focus} matters more
 
 The professionals who get promoted aren't always the most technically skilled. They're the ones who consistently deliver ${randomOutcome}.`
-    ];
+      ];
+      
+      return casualBodies[uniqueId % casualBodies.length];
+    }
     
-    return casualBodies[uniqueId % casualBodies.length];
-  }
-  
-  // Bold tone  
-  if (tone === 'bold') {
-    const boldBodies = [
-      `After working in ${keyWord} for years, I've come to a controversial conclusion: the industry has ${focus} completely backwards.
+    // Bold tone  
+    if (tone === 'bold') {
+      const boldBodies = [
+        `After working in ${keyWord} for years, I've come to a controversial conclusion: the industry has ${focus} completely backwards.
 
 What we get wrong:
 
@@ -453,7 +453,7 @@ What we get wrong:
 
 The most successful professionals I know aren't the ones with the most impressive technical skills. They're the ones who can take complex ${skillsList} and apply them to create simple, valuable ${randomOutcome}.`,
 
-      `The ${keyWord} industry has convinced everyone they need more ${skillsList} when they really need better ${focus}.
+        `The ${keyWord} industry has convinced everyone they need more ${skillsList} when they really need better ${focus}.
 
 Hard truths about ${focus}:
 
@@ -465,7 +465,7 @@ Hard truths about ${focus}:
 
 We're optimizing for the wrong metrics while the real drivers of ${randomOutcome} go ignored.`,
 
-      `Unpopular opinion: The ${keyWord} field is broken because we prioritize ${skillsList} over ${focus}.
+        `Unpopular opinion: The ${keyWord} field is broken because we prioritize ${skillsList} over ${focus}.
 
 What needs to change:
 
@@ -476,16 +476,36 @@ What needs to change:
 • Measure impact by ${randomOutcome}, not technical sophistication
 
 The future belongs to professionals who can bridge the gap between technical capability and real-world ${focus}.`
-    ];
+      ];
+      
+      return boldBodies[uniqueId % boldBodies.length];
+    }
     
-    return boldBodies[uniqueId % boldBodies.length];
-  }
-  
-  // Fallback return
-  return `After working in ${(prompt || 'professional development').toLowerCase()} for the past few years, I've come to a controversial conclusion: we're solving the wrong problems.\n\nWhat the industry gets wrong:\n\n• Obsession with technical complexity over business simplicity\n• Building solutions that impress other technologists but confuse customers\n• Focusing on what's technically possible instead of what's actually needed\n• Treating ${skillsList} as the end goal rather than the means to solve real problems\n\nThe most successful professionals I know aren't the ones with the most impressive technical portfolios. They're the ones who can take complex capabilities and apply them to solve simple, valuable business problems.`;
+    // Default fallback if no tone matches
+    return `My journey in ${keyWord} has taught me valuable lessons about balancing technical expertise with real-world impact.
+
+Key insights:
+
+• Technical skills like ${skillsList} are just the foundation
+• Understanding business needs and ${randomInsight} drives success
+• ${randomLearning} often matters more than complexity
+• Real impact comes from solving meaningful problems through ${randomOutcome}
+• The most successful professionals combine technical depth with strategic thinking
+
+The future belongs to those who can navigate both technical challenges and ${randomChallenge} to deliver ${randomOutcome}.`;
+    
   } catch (error) {
     console.error('Error in generateContextualBody:', error);
-    return `My journey in professional development has taught me valuable lessons about balancing technical expertise with real-world impact.\n\nKey insights:\n\n• Technical skills are just the foundation\n• Understanding business needs drives success\n• Communication often matters more than complexity\n• Real impact comes from solving meaningful problems\n\nThe most successful professionals combine technical depth with strategic thinking.`;
+    return `My journey in professional development has taught me valuable lessons about balancing technical expertise with real-world impact.
+
+Key insights:
+
+• Technical skills are just the foundation
+• Understanding business needs drives success
+• Communication often matters more than complexity
+• Real impact comes from solving meaningful problems
+
+The most successful professionals combine technical depth with strategic thinking.`;
   }
 }
 
