@@ -46,7 +46,7 @@ serve(async (req) => {
     console.log('✅ User authenticated:', user.id);
 
     // Extract structured data from resume using OpenAI
-    const systemPrompt = \`Extract structured information from this resume text and return as JSON:
+    const systemPrompt = `Extract structured information from this resume text and return as JSON:
 {
   "name": "full name",
   "email": "email address",
@@ -54,13 +54,13 @@ serve(async (req) => {
   "experience": [{"company": "name", "role": "title", "duration": "period", "achievements": ["achievement1"]}],
   "education": [{"institution": "name", "degree": "degree", "year": "year"}],
   "projects": [{"name": "project name", "description": "description", "technologies": ["tech1"]}]
-}\`
+}`
 
     console.log('✅ Making OpenAI API call...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': \`Bearer \${openaiApiKey}\`,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -78,7 +78,7 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ OpenAI API error:', response.status, errorText);
-      throw new Error(\`OpenAI API error: \${response.statusText} - \${errorText}\`)
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`)
     }
 
     const openaiResult = await response.json()
@@ -94,7 +94,7 @@ serve(async (req) => {
         name: "Resume Data",
         skills: ["Data Analysis", "Business Intelligence", "Analytics"],
         experience: [{"company": "Various", "role": "Analyst", "duration": "Recent", "achievements": ["Data-driven insights"]}],
-        education": [{"institution": "University", "degree": "Business Degree", "year": "Recent"}],
+        education: [{"institution": "University", "degree": "Business Degree", "year": "Recent"}],
         projects: [{"name": "Analytics Project", "description": "Business analysis work", "technologies": ["Excel", "SQL"]}]
       }
     }

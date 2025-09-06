@@ -56,8 +56,8 @@ serve(async (req) => {
       systemPrompt += `\n\nUser's background:
 - Name: ${resumeData.name}
 - Skills: ${resumeData.skills?.join(', ') || 'Not specified'}
-- Experience: ${resumeData.experience?.map(exp => \`\${exp.role} at \${exp.company}\`).join(', ') || 'Not specified'}
-- Education: ${resumeData.education?.map(edu => \`\${edu.degree} from \${edu.institution}\`).join(', ') || 'Not specified'}`;
+- Experience: ${resumeData.experience?.map(exp => exp.role + ' at ' + exp.company).join(', ') || 'Not specified'}
+- Education: ${resumeData.education?.map(edu => edu.degree + ' from ' + edu.institution).join(', ') || 'Not specified'}`;
     }
     
     systemPrompt += `\n\nGenerate posts in exactly these 3 tones:
@@ -76,7 +76,7 @@ Return ONLY a JSON array with objects containing: { "tone": "professional/casual
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': \`Bearer \${openaiApiKey}\`,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -93,7 +93,7 @@ Return ONLY a JSON array with objects containing: { "tone": "professional/casual
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ OpenAI API error:', response.status, errorText);
-      throw new Error(\`OpenAI API error: \${response.statusText} - \${errorText}\`);
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`);
     }
 
     const openaiResult = await response.json();
