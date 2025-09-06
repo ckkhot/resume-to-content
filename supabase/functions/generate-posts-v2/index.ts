@@ -160,10 +160,12 @@ Generate 3 completely unique LinkedIn posts about this topic. Each post should o
 
 // Intelligent fallback function that creates truly dynamic posts
 function generateIntelligentFallback(prompt: string, resumeData: any, userContext: string): any[] {
+  // Generate completely random seed for each request to ensure uniqueness
   const timestamp = Date.now();
-  const sessionSeed = Math.floor(Math.random() * 10000);
+  const randomComponent = Math.floor(Math.random() * 100000);
+  const sessionSeed = (timestamp + randomComponent) % 10000;
   
-  console.log(`🎲 Session seed: ${sessionSeed} for prompt: "${prompt}"`);
+  console.log(`🎲 Session seed: ${sessionSeed} for prompt: "${prompt}" (timestamp: ${timestamp})`);
   
   // Extract key information
   const name = resumeData?.name || 'Professional';
@@ -180,24 +182,31 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
   const isGrowth = promptLower.includes('growth') || promptLower.includes('development');
   const isWork = promptLower.includes('work') || promptLower.includes('company') || promptLower.includes('project');
   
-  // Create unique context for each post
+  // Generate completely random variations for each post to ensure uniqueness
+  const randomVariations = [
+    Math.floor(Math.random() * 3),
+    Math.floor(Math.random() * 3),
+    Math.floor(Math.random() * 3)
+  ];
+  
+  // Create unique context for each post with random variations
   const contexts = [
     { 
       tone: 'professional', 
-      seed: sessionSeed + 1,
-      variation: sessionSeed % 3,
+      seed: sessionSeed + Math.floor(Math.random() * 100),
+      variation: randomVariations[0],
       focus: isJobSearch ? 'strategy' : isGraduation ? 'learning' : 'expertise'
     },
     { 
       tone: 'casual', 
-      seed: sessionSeed + 2,
-      variation: (sessionSeed + 1) % 3,
+      seed: sessionSeed + Math.floor(Math.random() * 100) + 50,
+      variation: randomVariations[1],
       focus: isWork ? 'experience' : isAI ? 'innovation' : 'journey'
     },
     { 
       tone: 'bold', 
-      seed: sessionSeed + 3,
-      variation: (sessionSeed + 2) % 3,
+      seed: sessionSeed + Math.floor(Math.random() * 100) + 100,
+      variation: randomVariations[2],
       focus: isAnalytics ? 'disruption' : isGrowth ? 'transformation' : 'breakthrough'
     }
   ];
@@ -219,7 +228,7 @@ function generateIntelligentFallback(prompt: string, resumeData: any, userContex
     })
   }));
   
-  console.log(`✅ Generated 3 unique fallback posts with variations: ${contexts.map(c => c.variation).join(', ')}`);
+  console.log(`✅ Generated 3 unique fallback posts with random variations: ${randomVariations.join(', ')}`);
   return posts;
 }
 
