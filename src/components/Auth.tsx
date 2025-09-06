@@ -22,27 +22,43 @@ export const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: {
-          full_name: fullName,
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: fullName,
+          },
         },
-      },
-    });
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
       });
-    } else {
+
+      if (error) {
+        toast({
+          title: "Signup Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else if (data.user && !data.user.email_confirmed_at) {
+        toast({
+          title: "Check Your Email",
+          description: "We've sent you a confirmation link. Please check your email and click the link to activate your account.",
+        });
+        setEmail('');
+        setPassword('');
+        setFullName('');
+      } else {
+        toast({
+          title: "Account Created",
+          description: "Your account has been created successfully!",
+        });
+      }
+    } catch (err) {
       toast({
-        title: "Success",
-        description: "Check your email for the confirmation link!",
+        title: "Signup Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
       });
     }
     setLoading(false);
@@ -52,15 +68,36 @@ export const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
+      if (error) {
+        let errorMessage = error.message;
+        
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = "Invalid email or password. Make sure you've signed up and confirmed your email address.";
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = "Please check your email and click the confirmation link before signing in.";
+        }
+        
+        toast({
+          title: "Sign In Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } else if (data.user) {
+        toast({
+          title: "Welcome Back!",
+          description: "You've been signed in successfully.",
+        });
+      }
+    } catch (err) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Sign In Error",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     }
@@ -104,7 +141,12 @@ export const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Tabs defaultValue="signin" className="w-full">
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              👋 <strong>New here?</strong> Start with the Sign Up tab to create your account first!
+            </p>
+          </div>
+          <Tabs defaultValue="signup" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-muted border border-tech-border">
               <TabsTrigger 
                 value="signin" 
