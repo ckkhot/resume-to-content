@@ -113,42 +113,68 @@ serve(async (req) => {
     if (openaiApiKey) {
       console.log('🔄 Attempting OpenAI generation...');
       try {
-        // Build personalized context
-        let userContext = '';
-        if (resumeData && resumeData.name) {
-          userContext = `User is: ${resumeData.name}`;
-          if (resumeData.skills) userContext += `, with expertise in: ${resumeData.skills.join(', ')}`;
-          if (resumeData.experience) userContext += `, with experience in: ${resumeData.experience}`;
-        } else {
-          userContext = 'User is a business analytics professional';
+        // Build comprehensive personalized context from resume
+        let userContext = 'User is a business professional';
+        let skillsContext = '';
+        let experienceContext = '';
+        
+        if (resumeData) {
+          if (resumeData.name) userContext = `User: ${resumeData.name}`;
+          if (resumeData.email) userContext += ` (${resumeData.email})`;
+          
+          if (resumeData.skills && resumeData.skills.length > 0) {
+            skillsContext = `\nTechnical Skills: ${resumeData.skills.join(', ')}`;
+          }
+          
+          if (resumeData.experience && resumeData.experience.length > 0) {
+            experienceContext = `\nProfessional Experience: ${resumeData.experience.map(exp => 
+              `${exp.role} at ${exp.company} (${exp.duration})`
+            ).join('; ')}`;
+          }
+          
+          if (resumeData.education && resumeData.education.length > 0) {
+            experienceContext += `\nEducation: ${resumeData.education.map(edu =>
+              `${edu.degree} from ${edu.institution} (${edu.year})`
+            ).join('; ')}`;
+          }
         }
 
-        // Enhanced system prompt with new format requirements
-        const systemPrompt = `You are a LinkedIn content strategist. Create 3 unique, varied LinkedIn posts about the topic provided.
+        // Enhanced system prompt with better resume integration
+        const systemPrompt = `You are an expert LinkedIn content strategist. Create 3 completely unique and dynamic LinkedIn posts based on the user's specific prompt and background.
 
-${userContext}
+${userContext}${skillsContext}${experienceContext}
 
-FORMAT REQUIREMENTS:
-- Start with a sticky, scroll-stopping, one sentence hook
-- Body in narrative style using storytelling
-- Use bullet points where necessary for clarity
+CRITICAL REQUIREMENTS:
+- Each post must be completely different in perspective, tone, and content
+- Incorporate the user's actual background and prompt topic seamlessly
+- Start with a sticky, scroll-stopping, one sentence hook that grabs attention
+- Body should tell a story using the user's real experience and skills
+- Use bullet points strategically for key insights
 - NO EMOJIS anywhere in the content
-- End with a clear CTA encouraging comments, likes, or engagement
+- End with a compelling CTA that encourages engagement (comments, likes, shares)
 
-TONE VARIATIONS:
-1. Professional: Corporate-friendly, authoritative
-2. Casual: Relatable, conversational 
-3. Bold: Attention-grabbing, provocative
+TONE VARIATIONS (each completely different):
+1. Professional: Authoritative, industry-focused, thought leadership
+2. Casual: Personal, relatable, behind-the-scenes insights  
+3. Bold: Contrarian, provocative, challenges conventional thinking
 
-VARIATION: Each post must be completely different in approach, perspective, and content. Use different angles, examples, and insights.
+UNIQUENESS: Make each post offer a completely different angle on the topic. Use different examples, perspectives, and insights. Never repeat similar ideas across posts.
 
-Return JSON array: [{"tone": "professional", "hook": "...", "body": "...", "cta": "..."}, {"tone": "casual", "hook": "...", "body": "...", "cta": "..."}, {"tone": "bold", "hook": "...", "body": "...", "cta": "..."}]`;
+Return ONLY valid JSON: [{"tone": "professional", "hook": "...", "body": "...", "cta": "..."}, {"tone": "casual", "hook": "...", "body": "...", "cta": "..."}, {"tone": "bold", "hook": "...", "body": "...", "cta": "..."}]`;
 
-        // Add timestamp for variation
+        // Create dynamic prompt with timestamp and user specifics
         const timestamp = Date.now();
-        const userPrompt = `Topic: ${prompt}
+        const randomVariation = Math.floor(Math.random() * 100);
+        
+        const userPrompt = `Topic: "${prompt}"
 
-Generate 3 completely different posts about this topic. Each should offer a unique perspective or angle. Variation ID: ${timestamp}`;
+Context: Generate posts that specifically relate to this topic while incorporating the user's background and experience. Each post should offer a completely unique perspective.
+
+Requirements:
+- Make it personal and specific to the user's background
+- Each of the 3 posts should approach the topic from entirely different angles
+- Use real insights that would come from someone with their experience
+- Variation Seed: ${timestamp}-${randomVariation} (ensure each generation is unique)`;
 
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -173,20 +199,32 @@ Generate 3 completely different posts about this topic. Each should offer a uniq
           
           try {
             const responseContent = openaiResult.choices[0].message.content;
-            console.log('🔍 OpenAI raw response content:', responseContent.substring(0, 200) + '...');
+            console.log('🔍 OpenAI raw response length:', responseContent.length);
+            console.log('🔍 OpenAI response preview:', responseContent.substring(0, 300) + '...');
             
             const generatedPosts = JSON.parse(responseContent);
+            console.log('🔍 Parsed posts count:', generatedPosts?.length, 'Type:', Array.isArray(generatedPosts));
+            
             if (Array.isArray(generatedPosts) && generatedPosts.length === 3) {
-              posts = generatedPosts.map(post => ({
-                ...post,
-                hook: post.hook || 'Default hook',
-                body: post.body || 'Default body',
-                cta: post.cta || 'What are your thoughts?'
-              }));
-              console.log('✅ OpenAI posts generated successfully');
-              usedOpenAI = true; // Mark that we used OpenAI
+              // Validate each post has required fields
+              const validPosts = generatedPosts.filter(post => 
+                post.tone && post.hook && post.body && post.cta
+              );
+              
+              if (validPosts.length === 3) {
+                posts = validPosts.map(post => ({
+                  tone: post.tone,
+                  hook: post.hook || 'Generated hook',
+                  body: post.body || 'Generated body',
+                  cta: post.cta || 'Share your thoughts!'
+                }));
+                console.log('✅ OpenAI generated 3 valid posts successfully');
+                usedOpenAI = true;
+              } else {
+                console.log('⚠️ Some posts missing required fields. Valid:', validPosts.length, '/3');
+              }
             } else {
-              console.log('⚠️ Invalid OpenAI response structure:', typeof generatedPosts, 'length:', generatedPosts?.length);
+              console.log('⚠️ Invalid OpenAI response structure. Expected 3 posts, got:', generatedPosts?.length);
             }
           } catch (e) {
             console.log('⚠️ OpenAI response parsing failed:', e.message);
