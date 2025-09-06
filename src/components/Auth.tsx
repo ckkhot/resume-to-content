@@ -92,68 +92,103 @@ export const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>LinkedIn Post Generator</CardTitle>
-          <CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-background tech-grid p-4">
+      <Card className="w-full max-w-md shadow-tech-lg border-tech-border bg-surface">
+        <CardHeader className="space-y-3 text-center">
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-tech-primary to-tech-secondary bg-clip-text text-transparent">
+            LinkedIn Post Generator
+          </CardTitle>
+          <CardDescription className="text-muted-foreground text-base">
             Sign in to start generating amazing LinkedIn posts
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-muted border border-tech-border">
+              <TabsTrigger 
+                value="signin" 
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
+              >
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
+              >
+                Sign Up
+              </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="signin">
+            <TabsContent value="signin" className="mt-6">
               <form onSubmit={handleSignIn} className="space-y-4">
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <Button type="submit" className="w-full" disabled={loading}>
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="input-tech h-11 px-4 border-tech-border focus:border-primary transition-all duration-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="input-tech h-11 px-4 border-tech-border focus:border-primary transition-all duration-200"
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-primary hover:bg-tech-secondary text-primary-foreground transition-all duration-200 shadow-tech hover:shadow-tech-lg" 
+                  disabled={loading}
+                >
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </form>
             </TabsContent>
             
-            <TabsContent value="signup">
+            <TabsContent value="signup" className="mt-6">
               <form onSubmit={handleSignUp} className="space-y-4">
-                <Input
-                  type="text"
-                  placeholder="Full Name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <Input
-                  type="password"
-                  placeholder="Password (min 6 characters)"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                />
-                <Button type="submit" className="w-full" disabled={loading}>
+                <div className="space-y-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    className="input-tech h-11 px-4 border-tech-border focus:border-primary transition-all duration-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="input-tech h-11 px-4 border-tech-border focus:border-primary transition-all duration-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    type="password"
+                    placeholder="Password (min 6 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="input-tech h-11 px-4 border-tech-border focus:border-primary transition-all duration-200"
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-primary hover:bg-tech-secondary text-primary-foreground transition-all duration-200 shadow-tech hover:shadow-tech-lg" 
+                  disabled={loading}
+                >
                   {loading ? 'Creating account...' : 'Sign Up'}
                 </Button>
               </form>
