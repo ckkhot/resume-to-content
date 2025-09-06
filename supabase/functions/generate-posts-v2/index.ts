@@ -353,7 +353,7 @@ The professionals who consistently deliver ${randomOutcome} are those who master
 
 Key insights from my journey:
 
-• ${randomLearning.charAt(0).toUpperCase() + randomLearning.slice(1)} often matters more than technical skills
+• ${(randomLearning || 'Communication skills').charAt(0).toUpperCase() + (randomLearning || 'communication skills').slice(1)} often matters more than technical skills
 • Success requires navigating ${randomChallenge} effectively
 • Understanding ${randomInsight} drives strategic decisions
 • Building ${randomOutcome} requires cross-functional collaboration
