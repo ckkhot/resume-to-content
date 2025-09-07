@@ -6,6 +6,7 @@ import { Upload, Send, User, Brain, Zap } from "lucide-react";
 import { PostOutput } from "./PostOutput";
 import { PostLibrary } from "./PostLibrary";
 import { ResumeUpload } from "./ResumeUpload";
+import { ProfileManager } from "./ProfileManager";
 import { ThemeToggle } from "./ThemeToggle";
 import { Auth } from "./Auth";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,7 +29,7 @@ export const LinkedInPostGenerator = () => {
   const [prompt, setPrompt] = useState("");
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activeTab, setActiveTab] = useState<'generator' | 'library'>('generator');
+  const [activeTab, setActiveTab] = useState<'generator' | 'library' | 'profile'>('generator');
   const [messages, setMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([]);
 
   if (loading) {
@@ -136,6 +137,13 @@ export const LinkedInPostGenerator = () => {
             >
               Post Library
             </Button>
+            <Button
+              variant={activeTab === 'profile' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('profile')}
+              className="rounded-md transition-all duration-200"
+            >
+              Profile
+            </Button>
           </div>
         </div>
 
@@ -143,20 +151,44 @@ export const LinkedInPostGenerator = () => {
         {activeTab === 'generator' ? (
           <>
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Sidebar - Resume Upload */}
+              {/* Left Sidebar - Profile Status */}
               <div className="lg:col-span-1">
-                <ResumeUpload 
-                  onUploadComplete={(data) => {
-                    if (data) {
-                      setResumeUploaded(true);
-                      setResumeData(data);
-                    } else {
-                      setResumeUploaded(false);
-                      setResumeData(null);
-                    }
-                  }}
-                  isUploaded={resumeUploaded}
-                />
+                {resumeData ? (
+                  <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="h-5 w-5 text-green-600" />
+                      <span className="font-medium text-green-800 dark:text-green-200">Profile Connected</span>
+                    </div>
+                    <p className="text-sm text-green-700 dark:text-green-300 mb-3">
+                      Using your profile data to personalize posts
+                    </p>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setActiveTab("profile")}
+                      className="text-green-700 hover:text-green-800 dark:text-green-300 dark:hover:text-green-200"
+                    >
+                      View/Edit Profile
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                    <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                      💡 Add Your Profile
+                    </h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                      Create your professional profile to generate more personalized LinkedIn posts
+                    </p>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setActiveTab("profile")}
+                      className="text-blue-700 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
+                    >
+                      Create Profile
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Main Chat Interface */}
@@ -252,9 +284,13 @@ export const LinkedInPostGenerator = () => {
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === 'library' ? (
           <div className="max-w-6xl mx-auto">
             <PostLibrary />
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto">
+            <ProfileManager onProfileUpdate={setResumeData} />
           </div>
         )}
       </div>
