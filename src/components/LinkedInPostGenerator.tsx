@@ -213,10 +213,12 @@ export const LinkedInPostGenerator = () => {
           </div>
         )}
 
-        {/* System Test Component - Only for debugging */}
-        <div className="max-w-6xl mx-auto mt-12">
-          <SystemTest />
-        </div>
+        {/* System Test Component - Only visible in development */}
+        {import.meta.env.DEV && (
+          <div className="max-w-6xl mx-auto mt-12">
+            <SystemTest />
+          </div>
+        )}
       </div>
     </div>
   );
