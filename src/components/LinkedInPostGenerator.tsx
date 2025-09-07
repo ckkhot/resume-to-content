@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, Send, User, Brain, Zap } from "lucide-react";
 import { PostOutput } from "./PostOutput";
+import { PostLibrary } from "./PostLibrary";
 import { ResumeUpload } from "./ResumeUpload";
 import { ThemeToggle } from "./ThemeToggle";
 import { Auth } from "./Auth";
@@ -27,6 +28,7 @@ export const LinkedInPostGenerator = () => {
   const [prompt, setPrompt] = useState("");
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [activeTab, setActiveTab] = useState<'generator' | 'library'>('generator');
   const [messages, setMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([]);
 
   if (loading) {
@@ -117,113 +119,142 @@ export const LinkedInPostGenerator = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Sidebar - Resume Upload */}
-          <div className="lg:col-span-1">
-            <ResumeUpload 
-              onUploadComplete={(data) => {
-                if (data) {
-                  setResumeUploaded(true);
-                  setResumeData(data);
-                } else {
-                  setResumeUploaded(false);
-                  setResumeData(null);
-                }
-              }}
-              isUploaded={resumeUploaded}
-            />
-          </div>
-
-          {/* Main Chat Interface */}
-          <div className="lg:col-span-2 flex flex-col h-[80vh]">
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto space-y-4 mb-6 p-4 bg-surface-muted rounded-lg border border-tech-border">
-              {messages.length === 0 ? (
-                <div className="text-center text-muted-foreground py-12">
-                  <Zap className="h-12 w-12 mx-auto mb-4 text-tech-accent" />
-                  <h3 className="text-lg font-medium mb-2">Ready to Generate Content</h3>
-                  <p className="text-sm">Upload your resume and describe the topic you want to create posts about.</p>
-                </div>
-              ) : (
-                messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`chat-message ${message.type}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0">
-                        {message.type === 'user' ? (
-                          <User className="h-5 w-5 text-foreground" />
-                        ) : (
-                          <Brain className="h-5 w-5 text-tech-primary" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-              
-              {isGenerating && (
-                <div className="chat-message assistant">
-                  <div className="flex items-start gap-3">
-                    <Brain className="h-5 w-5 text-tech-primary animate-pulse" />
-                    <div className="flex-1">
-                      <p className="text-sm">Generating your LinkedIn posts...</p>
-                      <div className="flex gap-1 mt-2">
-                        <div className="w-2 h-2 bg-tech-primary rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-tech-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 bg-tech-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Input Area */}
-            <Card className="p-4 border-tech-border">
-              <div className="flex gap-3">
-                <Textarea
-                  placeholder="Describe the topic you want to create LinkedIn posts about (e.g., 'My experience with machine learning internship' or 'Tips for landing your first tech job')"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="input-tech resize-none"
-                  rows={3}
-                />
-                <Button
-                  onClick={handleGeneratePosts}
-                  disabled={!prompt.trim() || isGenerating}
-                  className="btn-tech flex-shrink-0"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                💡 <strong>Tip:</strong> You can generate posts right away! Upload a resume for more personalized content, or start creating posts with any topic.
-              </p>
-            </Card>
+        {/* Navigation Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="flex bg-muted rounded-lg p-1 border border-tech-border">
+            <Button
+              variant={activeTab === 'generator' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('generator')}
+              className="rounded-md transition-all duration-200"
+            >
+              Generate Posts
+            </Button>
+            <Button
+              variant={activeTab === 'library' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('library')}
+              className="rounded-md transition-all duration-200"
+            >
+              Post Library
+            </Button>
           </div>
         </div>
 
-        {/* Generated Posts Output */}
-        {generatedPosts.length > 0 && (
-          <div className="max-w-6xl mx-auto mt-12">
-            <PostOutput 
-              posts={generatedPosts} 
-              onSavePost={savePost}
-              onSavePosts={savePosts}
-              isSaving={isSaving}
-            />
-          </div>
-        )}
+        {/* Tab Content */}
+        {activeTab === 'generator' ? (
+          <>
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Sidebar - Resume Upload */}
+              <div className="lg:col-span-1">
+                <ResumeUpload 
+                  onUploadComplete={(data) => {
+                    if (data) {
+                      setResumeUploaded(true);
+                      setResumeData(data);
+                    } else {
+                      setResumeUploaded(false);
+                      setResumeData(null);
+                    }
+                  }}
+                  isUploaded={resumeUploaded}
+                />
+              </div>
 
-        {/* System Test Component - Only visible in development */}
-        {import.meta.env.DEV && (
-          <div className="max-w-6xl mx-auto mt-12">
-            <SystemTest />
+              {/* Main Chat Interface */}
+              <div className="lg:col-span-2 flex flex-col h-[80vh]">
+                {/* Chat Messages */}
+                <div className="flex-1 overflow-y-auto space-y-4 mb-6 p-4 bg-surface-muted rounded-lg border border-tech-border">
+                  {messages.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-12">
+                      <Zap className="h-12 w-12 mx-auto mb-4 text-tech-accent" />
+                      <h3 className="text-lg font-medium mb-2">Ready to Generate Content</h3>
+                      <p className="text-sm">Upload your resume and describe the topic you want to create posts about.</p>
+                    </div>
+                  ) : (
+                    messages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={`chat-message ${message.type}`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0">
+                            {message.type === 'user' ? (
+                              <User className="h-5 w-5 text-foreground" />
+                            ) : (
+                              <Brain className="h-5 w-5 text-tech-primary" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  
+                  {isGenerating && (
+                    <div className="chat-message assistant">
+                      <div className="flex items-start gap-3">
+                        <Brain className="h-5 w-5 text-tech-primary animate-pulse" />
+                        <div className="flex-1">
+                          <p className="text-sm">Generating your LinkedIn posts...</p>
+                          <div className="flex gap-1 mt-2">
+                            <div className="w-2 h-2 bg-tech-primary rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-tech-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                            <div className="w-2 h-2 bg-tech-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input Area */}
+                <Card className="p-4 border-tech-border">
+                  <div className="flex gap-3">
+                    <Textarea
+                      placeholder="Describe the topic you want to create LinkedIn posts about (e.g., 'My experience with machine learning internship' or 'Tips for landing your first tech job')"
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="input-tech resize-none"
+                      rows={3}
+                    />
+                    <Button
+                      onClick={handleGeneratePosts}
+                      disabled={!prompt.trim() || isGenerating}
+                      className="btn-tech flex-shrink-0"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    💡 <strong>Tip:</strong> You can generate posts right away! Upload a resume for more personalized content, or start creating posts with any topic.
+                  </p>
+                </Card>
+              </div>
+            </div>
+
+            {/* Generated Posts Output */}
+            {generatedPosts.length > 0 && (
+              <div className="max-w-6xl mx-auto mt-12">
+                <PostOutput 
+                  posts={generatedPosts} 
+                  onSavePost={savePost}
+                  onSavePosts={savePosts}
+                  isSaving={isSaving}
+                />
+              </div>
+            )}
+
+            {/* System Test Component - Only visible in development */}
+            {import.meta.env.DEV && (
+              <div className="max-w-6xl mx-auto mt-12">
+                <SystemTest />
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="max-w-6xl mx-auto">
+            <PostLibrary />
           </div>
         )}
       </div>
