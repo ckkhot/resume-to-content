@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Heart, MessageCircle, Share, Repeat2 } from "lucide-react";
+import { Copy, Heart, MessageCircle, Share, Repeat2, Save, Download } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 
@@ -13,6 +13,9 @@ interface GeneratedPost {
 
 interface PostOutputProps {
   posts: GeneratedPost[];
+  onSavePost?: (post: GeneratedPost) => Promise<boolean>;
+  onSavePosts?: (posts: GeneratedPost[]) => Promise<boolean>;
+  isSaving?: boolean;
 }
 
 const toneConfig = {
@@ -33,8 +36,9 @@ const toneConfig = {
   }
 };
 
-export const PostOutput = ({ posts }: PostOutputProps) => {
+export const PostOutput = ({ posts, onSavePost, onSavePosts, isSaving = false }: PostOutputProps) => {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [savedPosts, setSavedPosts] = useState<Set<number>>(new Set());
   const { toast } = useToast();
 
   const copyToClipboard = async (post: GeneratedPost, index: number) => {
@@ -58,11 +62,41 @@ export const PostOutput = ({ posts }: PostOutputProps) => {
     }
   };
 
+  const handleSavePost = async (post: GeneratedPost, index: number) => {
+    if (!onSavePost) return;
+    
+    const success = await onSavePost(post);
+    if (success) {
+      setSavedPosts(prev => new Set([...prev, index]));
+    }
+  };
+
+  const handleSaveAllPosts = async () => {
+    if (!onSavePosts) return;
+    
+    const success = await onSavePosts(posts);
+    if (success) {
+      setSavedPosts(new Set(posts.map((_, index) => index)));
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-tech-primary mb-2">Your Content Calendar</h2>
         <p className="text-muted-foreground">3 posts in different tones - ready to publish</p>
+        {onSavePosts && (
+          <div className="mt-4">
+            <Button 
+              onClick={handleSaveAllPosts}
+              disabled={isSaving}
+              className="btn-tech"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              {isSaving ? "Saving..." : "Save All Posts"}
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
@@ -79,14 +113,27 @@ export const PostOutput = ({ posts }: PostOutputProps) => {
                     {toneConfig[post.tone].description}
                   </p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(post, index)}
-                  className="btn-ghost-tech"
-                >
-                  {copiedIndex === index ? "Copied!" : <Copy className="h-4 w-4" />}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(post, index)}
+                    className="btn-ghost-tech"
+                  >
+                    {copiedIndex === index ? "Copied!" : <Copy className="h-4 w-4" />}
+                  </Button>
+                  {onSavePost && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSavePost(post, index)}
+                      disabled={isSaving || savedPosts.has(index)}
+                      className="btn-ghost-tech"
+                    >
+                      {savedPosts.has(index) ? "Saved!" : <Save className="h-4 w-4" />}
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {/* Post Content */}

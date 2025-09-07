@@ -8,6 +8,7 @@ import { ResumeUpload } from "./ResumeUpload";
 import { ThemeToggle } from "./ThemeToggle";
 import { Auth } from "./Auth";
 import { useAuth } from "@/hooks/useAuth";
+import { usePostManager } from "@/hooks/usePostManager";
 import { supabase } from "@/integrations/supabase/client";
 import { SystemTest } from "./SystemTest";
 
@@ -20,6 +21,7 @@ interface GeneratedPost {
 
 export const LinkedInPostGenerator = () => {
   const { user, loading, signOut } = useAuth();
+  const { savePost, savePosts, isSaving } = usePostManager();
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resumeData, setResumeData] = useState<any>(null);
   const [prompt, setPrompt] = useState("");
@@ -209,7 +211,12 @@ export const LinkedInPostGenerator = () => {
         {/* Generated Posts Output */}
         {generatedPosts.length > 0 && (
           <div className="max-w-6xl mx-auto mt-12">
-            <PostOutput posts={generatedPosts} />
+            <PostOutput 
+              posts={generatedPosts} 
+              onSavePost={savePost}
+              onSavePosts={savePosts}
+              isSaving={isSaving}
+            />
           </div>
         )}
 
