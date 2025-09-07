@@ -34,74 +34,22 @@ export const ResumeUpload = ({ onUploadComplete, isUploaded }: ResumeUploadProps
 
   const processFile = async (file: File) => {
     setIsProcessing(true);
-    setHasError(false); // Reset error state
+    setHasError(false);
     setUploadedFile(file);
 
-    try {
-      // Convert file to text (in real app would use PDF parser)
-      const resumeText = `Professional resume for ${file.name.replace('.pdf', '')}. 
+    // Simulate processing time for better UX
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
-EXPERIENCE:
-- Senior Business Analyst at McKinsey & Company (2022-2024)
-- Data Analytics Intern at Google (Summer 2021)  
-- Research Assistant at Stanford Business School (2020-2022)
-
-EDUCATION:
-- MBA in Business Analytics, Stanford Graduate School of Business (2024)
-- MS in Data Science, UC Berkeley (2022)
-- BS in Economics, UC Davis (2020)
-
-SKILLS:
-- Advanced Analytics: Python, R, SQL, Tableau, Power BI
-- Business Intelligence: Financial Modeling, Market Research
-- Machine Learning: Predictive Analytics, Statistical Modeling
-- Project Management: Agile, Scrum, Cross-functional Leadership
-
-PROJECTS:
-- Customer Segmentation Analytics Platform (2023)
-- Revenue Optimization Model for Fortune 500 Client (2024)
-- Predictive Analytics Dashboard for Supply Chain (2023)
-
-ACHIEVEMENTS:
-- Led analytics team that increased client revenue by 23%
-- Published research on business intelligence optimization
-- Certified in Advanced Data Science and Analytics`;
-      
-      // Call the process-resume edge function
-      const { data, error } = await supabase.functions.invoke('process-resume', {
-        body: { resumeText }
-      });
-
-      if (error) {
-        console.error('Resume processing error:', error);
-        throw error;
-      }
-
-      const resumeData = data?.data || {};
-      console.log('Resume data extracted:', resumeData);
-      
-      setIsProcessing(false);
-      onUploadComplete(resumeData);
-      
-      toast({
-        title: "Resume processed successfully!",
-        description: "Your resume has been analyzed and information extracted for personalized content generation.",
-      });
-    } catch (error) {
-      console.error('Error processing resume:', error);
-      setIsProcessing(false);
-      setHasError(true);
-      
-      // Only show toast if this is an actual user-initiated upload
-      if (file) {
-        toast({
-          title: "Resume processing failed",
-          description: "No worries! You can still generate amazing LinkedIn posts. Resume data helps personalize content, but isn't required.",
-          variant: "destructive"
-        });
-      }
-      // Don't call onUploadComplete on error - let user try again or proceed without resume
-    }
+    setIsProcessing(false);
+    
+    // Show honest message about feature being in development
+    toast({
+      title: "PDF Processing Coming Soon!",
+      description: "We're building intelligent resume analysis. For now, you can still generate great LinkedIn posts without uploading a resume.",
+    });
+    
+    // Don't call onUploadComplete with fake data
+    // The app will work without resume data
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -136,34 +84,34 @@ ACHIEVEMENTS:
     onUploadComplete(null);
   };
 
-  if (isUploaded && uploadedFile) {
+  if (uploadedFile) {
     return (
       <Card className="p-6 border-tech-border bg-surface">
         <div className="text-center">
-          <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-600" />
+          <FileText className="h-12 w-12 mx-auto mb-4 text-tech-accent" />
           <h3 className="font-medium text-tech-primary mb-2">Resume Uploaded</h3>
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
             <FileText className="h-4 w-4" />
             <span>{uploadedFile.name}</span>
           </div>
-          <div className="space-y-2">
-            <div className="bg-hover-surface rounded-lg p-3 text-left">
-              <h4 className="text-sm font-medium mb-2">Extracted Information:</h4>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>• Experience level identified</li>
-                <li>• Skills and expertise mapped</li>
-                <li>• Industry focus detected</li>
-                <li>• Achievement patterns analyzed</li>
-              </ul>
+          <div className="space-y-3">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                🚧 PDF Processing In Development
+              </h4>
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                We're building intelligent resume analysis to personalize your LinkedIn posts. 
+                For now, you can generate amazing content without this feature!
+              </p>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={removeFile}
-              className="btn-ghost-tech w-full mt-4"
+              className="btn-ghost-tech w-full"
             >
               <X className="h-4 w-4 mr-2" />
-              Upload Different Resume
+              Try Different Resume
             </Button>
           </div>
         </div>
@@ -176,8 +124,11 @@ ACHIEVEMENTS:
       <div className="text-center mb-6">
         <h3 className="font-medium text-tech-primary mb-2">Upload Your Resume</h3>
         <p className="text-sm text-muted-foreground">
-          Upload your resume to personalize content generation
+          Help us build personalized content (feature in development)
         </p>
+        <div className="mt-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded px-2 py-1">
+          💡 You can generate great posts without uploading a resume
+        </div>
       </div>
 
       <div
@@ -227,13 +178,16 @@ ACHIEVEMENTS:
       </div>
 
       <div className="mt-6 text-xs text-muted-foreground">
-        <h4 className="font-medium mb-2">What we'll extract:</h4>
+        <h4 className="font-medium mb-2">Coming Soon - We'll extract:</h4>
         <ul className="space-y-1">
           <li>• Your experience level and background</li>
           <li>• Technical skills and expertise areas</li>
           <li>• Past achievements and projects</li>
           <li>• Industry and role preferences</li>
         </ul>
+        <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+          This feature is in active development. Your posts will be great even without resume data!
+        </p>
       </div>
     </Card>
   );
